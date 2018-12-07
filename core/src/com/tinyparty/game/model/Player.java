@@ -1,5 +1,7 @@
 package com.tinyparty.game.model;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -7,6 +9,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
+import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
+import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
 import com.tinyparty.game.physic.PhysicManager;
 
 public class Player extends Entity {
@@ -18,20 +22,48 @@ public class Player extends Entity {
 	private Vector2 oldPosition;
 	private Body body;
 
+	private BulletSizeSpeedParameter bulletSizeSpeedParameter;
+	private BulletDistanceAmountParameter bulletDistanceAmountParameter;
+
 	public Player(TinyParty game) {
 		this.game = game;
-		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
-	}
 
-	public void init() {
-		life = 3;
+		this.life = 3;
+		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
 		this.oldPosition = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, this, game.getGameScreen().getWorld());
+
 	}
 
 	@Override
 	public void update(float delta) {
+		if(Gdx.input.justTouched()) {
 
+		}
+
+		float y = 0f, x = 0f;
+		if(Gdx.input.isKeyPressed(Input.Keys.Z)) {
+			y += 1f;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+			y -= 1f;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
+			x -= 1f;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+			x += 1f;
+		}
+
+		if(x != 0f && y != 0f) {
+			x *= 0.7f;
+			y *= 0.7f;
+		}
+		body.setLinearVelocity(x * Constants.PLAYER_SPEED, y * Constants.PLAYER_SPEED);
+		if(!body.getPosition().epsilonEquals(oldPosition)) {
+			oldPosition.set(body.getPosition());
+			// TODO send position to server
+		}
 	}
 
 	@Override

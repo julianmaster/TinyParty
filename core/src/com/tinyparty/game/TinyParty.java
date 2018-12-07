@@ -32,7 +32,7 @@ public class TinyParty extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera();
-		viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
+		viewport = new FitViewport(Constants.CAMERA_WIDTH, Constants.CAMERA_HEIGHT, camera);
 		assetManager = new AssetManager();
 
 		client = new TinyPartyClient(this);
@@ -49,6 +49,17 @@ public class TinyParty extends Game {
 
 	public void load() {
 		assetManager.load(Asset.TEST.filename, Texture.class);
+		assetManager.load(Asset.GROUND1.filename, Texture.class);
+		assetManager.load(Asset.GROUND2.filename, Texture.class);
+		assetManager.load(Asset.GROUND3.filename, Texture.class);
+		assetManager.load(Asset.GROUND4.filename, Texture.class);
+		assetManager.load(Asset.GROUND5.filename, Texture.class);
+		assetManager.load(Asset.GROUND6.filename, Texture.class);
+		assetManager.load(Asset.GROUND7.filename, Texture.class);
+		assetManager.load(Asset.PLAYER.filename, Texture.class);
+		assetManager.load(Asset.STANDARD_BULLET.filename, Texture.class);
+
+		assetManager.finishLoading();
 	}
 
 	@Override
@@ -57,20 +68,37 @@ public class TinyParty extends Game {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		stage.act(Gdx.graphics.getDeltaTime());
-		camera.update();
-
-		batch.setProjectionMatrix(camera.combined);
 
 		super.render();
 		stage.draw();
 	}
-	
+
 	@Override
 	public void dispose () {
 		stage.dispose();
 		batch.dispose();
 		assetManager.dispose();
 		client.dispose();
+	}
+
+	public SpriteBatch getBatch() {
+		return batch;
+	}
+
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
+
+	public Stage getStage() {
+		return stage;
+	}
+
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+
+	public TinyPartyClient getClient() {
+		return client;
 	}
 
 	public GameScreen getGameScreen() {

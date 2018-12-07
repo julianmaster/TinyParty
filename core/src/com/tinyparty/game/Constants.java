@@ -1,12 +1,21 @@
 package com.tinyparty.game;
 
 public class Constants {
+	public static final int CAMERA_WIDTH = 200;
+	public static final int CAMERA_HEIGHT = 200;
+	public static final int WINDOM_ZOOM = 4;
+	public static final int WINDOW_WIDTH = CAMERA_WIDTH * WINDOM_ZOOM;
+	public static final int WINDOW_HEIGHT = CAMERA_HEIGHT * WINDOM_ZOOM;
+
+
 	// Network
 	public static final int PORT = 8465;
 	public static final String HOST = "localhost";
 
 	public static final float PLAYER_COLLISION_WIDTH = 2f;
 	public static final float PLAYER_COLLISION_HEIGHT = 4f;
+
+	public static final float PLAYER_SPEED = 48f;
 
 	public static final short PLAYER_CATEGORY = 1;
 	public static final short OTHER_PLAYER_CATEGORY = 2;
