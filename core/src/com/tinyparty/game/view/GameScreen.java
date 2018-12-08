@@ -3,6 +3,7 @@ package com.tinyparty.game.view;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -30,6 +31,7 @@ public class GameScreen extends ScreenAdapter {
 	private Player player;
 	private List<Entity> entities = new ArrayList<>();
 	private List<Entity> entitiesToAdd = new ArrayList<>();
+	private List<Entity> entitiesToRemove = new ArrayList<>();
 
 	// Box2D
 	private World world;
@@ -56,6 +58,7 @@ public class GameScreen extends ScreenAdapter {
 	public void render(float delta) {
 		Batch batch = game.getBatch();
 		Camera camera = game.getCamera();
+		AssetManager assetManager = game.getAssetManager();
 
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
 			showDebugPhysics = !showDebugPhysics;
@@ -63,14 +66,22 @@ public class GameScreen extends ScreenAdapter {
 
 		lock.lock();
 
+		// Add entities
 		for(Entity entity : entitiesToAdd) {
 			entities.add(entity);
 		}
 		entitiesToAdd.clear();
 
+		// Update entities
 		for(Entity entity : entities) {
 			entity.update(delta);
 		}
+
+		// Remove entities
+		for(Entity entity : entitiesToRemove) {
+			entities.remove(entity);
+		}
+		entitiesToRemove.clear();
 
 		camera.position.set(player.getPosition().x, player.getPosition().y,0);
 		camera.update();
@@ -86,6 +97,11 @@ public class GameScreen extends ScreenAdapter {
 			}
 		}
 		batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), player.getPosition().x, player.getPosition().y);
+
+		// Render entities
+		for(Entity entity : entities) {
+			entity.render(batch, assetManager);
+		}
 
 		batch.end();
 
@@ -112,6 +128,14 @@ public class GameScreen extends ScreenAdapter {
 
 	public World getWorld() {
 		return world;
+	}
+
+	public List<Entity> getEntitiesToRemove() {
+		return entitiesToRemove;
+	}
+
+	public List<Entity> getEntitiesToAdd() {
+		return entitiesToAdd;
 	}
 
 	public List<Body> getBodiesToRemove() {
