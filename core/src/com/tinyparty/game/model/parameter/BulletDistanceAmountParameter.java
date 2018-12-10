@@ -1,9 +1,9 @@
 package com.tinyparty.game.model.parameter;
 
 public enum BulletDistanceAmountParameter {
-	HIGH(6f, 1),
-	MEDIUM(4f, 3),
-	LOW(2f, 7);
+	HIGH(3f, 1),
+	MEDIUM(1.5f, 3),
+	LOW(0.6f, 7);
 
 	public float distance;
 	public int amount;

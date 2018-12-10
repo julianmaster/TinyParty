@@ -3,6 +3,7 @@ package com.tinyparty.game.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -15,6 +16,7 @@ import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
 import com.tinyparty.game.model.parameter.BulletFrenquecyDamageParameter;
 import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
 import com.tinyparty.game.physic.PhysicManager;
+import com.tinyparty.game.view.Asset;
 
 public class Player extends Entity {
 
@@ -39,10 +41,13 @@ public class Player extends Entity {
 		this.oldPosition = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, this, game.getGameScreen().getWorld());
 
-		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
+//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
 //		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
-		bulletDistanceAmountParameter = BulletDistanceAmountParameter.HIGH;
-		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
+//		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
+
+		bulletSizeSpeedParameter = BulletSizeSpeedParameter.STATIC;
+		bulletDistanceAmountParameter = BulletDistanceAmountParameter.LOW;
+		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.HIGH;
 	}
 
 	@Override
@@ -57,12 +62,22 @@ public class Player extends Entity {
 			Vector3 screenCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
 			Vector3 worldCoords = game.getCamera().unproject(screenCoords);
 
-			float angle = MathUtils.atan2(worldCoords.y - body.getPosition().y + 3f, worldCoords.x - body.getPosition().x);
-
 			for(float offset : BulletAmountConfiguration.configuration.get(bulletDistanceAmountParameter.amount)) {
-				Vector2 direction = new Vector2(MathUtils.cos(angle+offset), MathUtils.sin(angle+offset));
+				float angleRad = MathUtils.atan2(worldCoords.y - body.getPosition().y + 3f, worldCoords.x - body.getPosition().x);
+				float angleDeg = angleRad * MathUtils.radiansToDegrees + offset;
 
-				Bullet bullet = new Bullet(game, new Vector2(body.getPosition().x, body.getPosition().y - 3f), direction, angle+offset,true, bulletSizeSpeedParameter.size, bulletSizeSpeedParameter.speed, bulletFrenquecyDamageParameter.damage, bulletDistanceAmountParameter.distance);
+				Vector2 direction = new Vector2(MathUtils.cosDeg(angleDeg), MathUtils.sinDeg(angleDeg));
+
+				Vector2 position = new Vector2(body.getPosition().x + 1f, body.getPosition().y + 3f);
+				if(bulletSizeSpeedParameter == BulletSizeSpeedParameter.STATIC &&
+						(bulletDistanceAmountParameter == BulletDistanceAmountParameter.MEDIUM || bulletDistanceAmountParameter == BulletDistanceAmountParameter.LOW)) {
+					System.out.println(direction.x * (float)bulletDistanceAmountParameter.distance);
+					System.out.println(direction.y * bulletDistanceAmountParameter.distance);
+					position.x += direction.x * bulletDistanceAmountParameter.distance * bulletSizeSpeedParameter.speed;
+					position.y += direction.y * bulletDistanceAmountParameter.distance * bulletSizeSpeedParameter.speed;
+				}
+
+				new Bullet(game, position, direction, angleDeg*MathUtils.degreesToRadians,true, bulletSizeSpeedParameter.size, bulletSizeSpeedParameter.speed, bulletFrenquecyDamageParameter.damage, bulletDistanceAmountParameter.distance);
 			}
 		}
 
@@ -93,7 +108,7 @@ public class Player extends Entity {
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-
+		batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), body.getPosition().x, body.getPosition().y);
 	}
 
 	@Override

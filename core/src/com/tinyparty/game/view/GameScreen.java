@@ -96,7 +96,6 @@ public class GameScreen extends ScreenAdapter {
 				batch.draw(game.getAssetManager().get(assets[i][j].filename, Texture.class), 16*i, 16*j);
 			}
 		}
-		batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), player.getPosition().x, player.getPosition().y);
 
 		// Render entities
 		for(Entity entity : entities) {
