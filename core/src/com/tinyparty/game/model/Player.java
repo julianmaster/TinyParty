@@ -33,7 +33,8 @@ public class Player extends Entity {
 
 	private float waitFire = 0f;
 
-	public Player(TinyParty game) {
+	public Player(int id, TinyParty game) {
+		super(id);
 		this.game = game;
 
 		this.life = 3;
@@ -41,13 +42,13 @@ public class Player extends Entity {
 		this.oldPosition = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, this, game.getGameScreen().getWorld());
 
-//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
-//		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
-//		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
+		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
+		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
+		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
 
-		bulletSizeSpeedParameter = BulletSizeSpeedParameter.STATIC;
-		bulletDistanceAmountParameter = BulletDistanceAmountParameter.LOW;
-		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.HIGH;
+//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.STATIC;
+//		bulletDistanceAmountParameter = BulletDistanceAmountParameter.LOW;
+//		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.HIGH;
 	}
 
 	@Override
@@ -71,10 +72,8 @@ public class Player extends Entity {
 				Vector2 position = new Vector2(body.getPosition().x + 1f, body.getPosition().y + 3f);
 				if(bulletSizeSpeedParameter == BulletSizeSpeedParameter.STATIC &&
 						(bulletDistanceAmountParameter == BulletDistanceAmountParameter.MEDIUM || bulletDistanceAmountParameter == BulletDistanceAmountParameter.LOW)) {
-					System.out.println(direction.x * (float)bulletDistanceAmountParameter.distance);
-					System.out.println(direction.y * bulletDistanceAmountParameter.distance);
-					position.x += direction.x * bulletDistanceAmountParameter.distance * bulletSizeSpeedParameter.speed;
-					position.y += direction.y * bulletDistanceAmountParameter.distance * bulletSizeSpeedParameter.speed;
+					position.x += direction.x * BulletDistanceAmountParameter.LOW.distance * BulletSizeSpeedParameter.SLOW.speed;
+					position.y += direction.y * BulletDistanceAmountParameter.LOW.distance * BulletSizeSpeedParameter.SLOW.speed;
 				}
 
 				new Bullet(game, position, direction, angleDeg*MathUtils.degreesToRadians,true, bulletSizeSpeedParameter.size, bulletSizeSpeedParameter.speed, bulletFrenquecyDamageParameter.damage, bulletDistanceAmountParameter.distance);

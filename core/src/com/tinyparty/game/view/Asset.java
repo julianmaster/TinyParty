@@ -2,6 +2,11 @@ package com.tinyparty.game.view;
 
 public enum Asset {
 
+	// Font
+	FONT_BIG("kenney_blocks_big.fnt"),
+	FONT_NORMAL("kenney_blocks_normal.fnt"),
+	FONT_SMALL("kenney_blocks_small.fnt"),
+
 	// Assets
 	GROUND1("ground1.png"),
 	GROUND2("ground2.png"),

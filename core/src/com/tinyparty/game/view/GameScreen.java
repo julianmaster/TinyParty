@@ -18,6 +18,7 @@ import com.tinyparty.game.model.Player;
 import com.tinyparty.game.physic.EntityContactListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,11 +48,14 @@ public class GameScreen extends ScreenAdapter {
 		lock.unlock();
 	}
 
+	public void init(int id) {
+		player = new Player(id, game);
+		entitiesToAdd.add(player);
+	}
+
 	@Override
 	public void show() {
 		ground = new Ground();
-		player = new Player(game);
-		entitiesToAdd.add(player);
 	}
 
 	@Override
@@ -88,6 +92,8 @@ public class GameScreen extends ScreenAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 
+		Collections.sort(entities);
+
 		batch.begin();
 
 		Asset[][] assets = ground.getAssets();
@@ -115,6 +121,11 @@ public class GameScreen extends ScreenAdapter {
 
 		world.step(1/60f, 6, 2);
 		lock.unlock();
+	}
+
+	@Override
+	public void hide() {
+
 	}
 
 	@Override

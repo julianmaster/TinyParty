@@ -7,6 +7,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -15,6 +17,7 @@ import com.tinyparty.game.network.TinyPartyClient;
 import com.tinyparty.game.view.Asset;
 import com.tinyparty.game.view.CustomColor;
 import com.tinyparty.game.view.GameScreen;
+import com.tinyparty.game.view.StartScreen;
 
 public class TinyParty extends Game {
 	private SpriteBatch batch;
@@ -22,12 +25,17 @@ public class TinyParty extends Game {
 	private Viewport viewport;
 	private Stage stage;
 	private AssetManager assetManager;
+	private BitmapFont fontBig;
+	private BitmapFont fontNormal;
+	private BitmapFont fontSmall;
+	private GlyphLayout layout;
 
 	// Network
 	private TinyPartyClient client;
 
+	private StartScreen startScreen;
 	private GameScreen gameScreen;
-	
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
@@ -43,12 +51,25 @@ public class TinyParty extends Game {
 		stage = new Stage(viewport, batch);
 		Gdx.input.setInputProcessor(stage);
 
+		// Define Font
+		fontBig = assetManager.get(Asset.FONT_BIG.filename, BitmapFont.class);
+		fontBig.getData().markupEnabled = true;
+		fontNormal = assetManager.get(Asset.FONT_NORMAL.filename, BitmapFont.class);
+		fontNormal.getData().markupEnabled = true;
+		fontSmall = assetManager.get(Asset.FONT_SMALL.filename, BitmapFont.class);
+		fontSmall.getData().markupEnabled = true;
+		layout = new GlyphLayout();
+
+		startScreen = new StartScreen(this);
 		gameScreen = new GameScreen(this);
-		this.setScreen(gameScreen);
+		this.setScreen(startScreen);
 	}
 
 	public void load() {
 		assetManager.load(Asset.TEST.filename, Texture.class);
+		assetManager.load(Asset.FONT_BIG.filename, BitmapFont.class);
+		assetManager.load(Asset.FONT_NORMAL.filename, BitmapFont.class);
+		assetManager.load(Asset.FONT_SMALL.filename, BitmapFont.class);
 		assetManager.load(Asset.GROUND1.filename, Texture.class);
 		assetManager.load(Asset.GROUND2.filename, Texture.class);
 		assetManager.load(Asset.GROUND3.filename, Texture.class);
@@ -64,7 +85,7 @@ public class TinyParty extends Game {
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(CustomColor.BLUE2.r, CustomColor.BLUE2.g, CustomColor.BLUE2.b, CustomColor.BLUE2.a);
+		Gdx.gl.glClearColor(CustomColor.BLACK.r, CustomColor.BLACK.g, CustomColor.BLACK.b, CustomColor.BLACK.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		stage.act(Gdx.graphics.getDeltaTime());
@@ -97,8 +118,28 @@ public class TinyParty extends Game {
 		return assetManager;
 	}
 
+	public BitmapFont getFontBig() {
+		return fontBig;
+	}
+
+	public BitmapFont getFontNormal() {
+		return fontNormal;
+	}
+
+	public BitmapFont getFontSmall() {
+		return fontSmall;
+	}
+
+	public GlyphLayout getLayout() {
+		return layout;
+	}
+
 	public TinyPartyClient getClient() {
 		return client;
+	}
+
+	public StartScreen getStartScreen() {
+		return startScreen;
 	}
 
 	public GameScreen getGameScreen() {

@@ -25,6 +25,7 @@ public class Bullet extends Entity {
 	private Body body;
 
 	public Bullet(TinyParty game, Vector2 position, Vector2 direction, float angle, boolean sourceOfFire, int size, float speed, float damage, float distance) {
+		super(-1);
 		this.game = game;
 		this.direction = direction;
 		this.sourceOfFire = sourceOfFire;
@@ -71,7 +72,7 @@ public class Bullet extends Entity {
 
 	@Override
 	public int compareTo(Object o) {
-		return 0;
+		return 1;
 	}
 
 	@Override

@@ -1,8 +1,12 @@
 package com.tinyparty.game;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.github.czyzby.websocket.serialization.Serializer;
 import com.github.czyzby.websocket.serialization.impl.JsonSerializer;
+import com.tinyparty.game.network.json.client.RequestJoinPartyJson;
+import com.tinyparty.game.network.json.server.ResponseJoinPartyJson;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocketFrame;
@@ -19,6 +23,8 @@ public class TinyPartyServer {
 
 	private List<ServerWebSocket> webSockets = new ArrayList<>();
 
+	private List<Integer> players = new ArrayList<>();
+
 	private void launch() {
 		System.out.println("Launching web socket server...");
 		final HttpServer server = vertx.createHttpServer();
@@ -33,6 +39,23 @@ public class TinyPartyServer {
 		final Object request = serializer.deserialize(frame.binaryData().getBytes());
 
 		lock.lock();
+		if(request instanceof RequestJoinPartyJson) {
+			RequestJoinPartyJson requestJoinPartyJson = (RequestJoinPartyJson)request;
+
+			int id;
+			do {
+				id = MathUtils.random(10000);
+			} while(players.contains(id));
+
+			players.add(id);
+
+			ResponseJoinPartyJson responseJoinPartyJson = new ResponseJoinPartyJson();
+			responseJoinPartyJson.id = id;
+			webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseJoinPartyJson)));
+		}
+//		else if() {
+//
+//		}
 //		if(request instanceof RequestJoinPartyJson) {
 //			RequestJoinPartyJson requestJoinPartyJson = (RequestJoinPartyJson)request;
 //			Party party = parties.get(requestJoinPartyJson.party);
