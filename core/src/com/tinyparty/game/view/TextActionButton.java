@@ -88,7 +88,6 @@ public class TextActionButton extends Actor {
 	@Override
 	protected void sizeChanged() {
 		layout.setText(font, str);
-		System.out.println(layout.height);
 		this.setSize(layout.width, layout.height);
 	}
 

@@ -78,6 +78,7 @@ public class TinyParty extends Game {
 		assetManager.load(Asset.GROUND6.filename, Texture.class);
 		assetManager.load(Asset.GROUND7.filename, Texture.class);
 		assetManager.load(Asset.PLAYER.filename, Texture.class);
+		assetManager.load(Asset.PLAYER_2.filename, Texture.class);
 		assetManager.load(Asset.STANDARD_BULLET.filename, Texture.class);
 
 		assetManager.finishLoading();

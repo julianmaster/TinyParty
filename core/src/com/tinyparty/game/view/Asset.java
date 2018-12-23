@@ -16,6 +16,7 @@ public enum Asset {
 	GROUND6("ground6.png"),
 	GROUND7("ground7.png"),
 	PLAYER("player.png"),
+	PLAYER_2("player_2.png"),
 	STANDARD_BULLET("standard_bullet.png"),
 
 	// Test

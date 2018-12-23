@@ -12,6 +12,7 @@ public class Constants {
 	public static final int PORT = 8465;
 	public static final String HOST = "localhost";
 
+	public static final float PLAYER_INVINSIBLE_DURATION = 15f;
 	public static final float PLAYER_COLLISION_WIDTH = 2f;
 	public static final float PLAYER_COLLISION_HEIGHT = 4f;
 

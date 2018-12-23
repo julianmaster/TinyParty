@@ -36,7 +36,14 @@ public class TinyPartyClient implements Disposable {
 				if(response instanceof ResponseJoinPartyJson) {
 					ResponseJoinPartyJson responseJoinPartyJson = (ResponseJoinPartyJson)response;
 
-					// TODO change to gameScreen and init info from response
+					game.getStartScreen().getLock().lock();
+					game.getGameScreen().getLock().lock();
+
+					game.getGameScreen().init(responseJoinPartyJson.id);
+					game.setScreen(game.getGameScreen());
+
+					game.getGameScreen().getLock().unlock();
+					game.getStartScreen().getLock().unlock();
 				}
 
 				return FULLY_HANDLED;

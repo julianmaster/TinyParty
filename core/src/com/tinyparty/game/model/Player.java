@@ -31,6 +31,7 @@ public class Player extends Entity {
 	private BulletDistanceAmountParameter bulletDistanceAmountParameter;
 	private BulletFrenquecyDamageParameter bulletFrenquecyDamageParameter;
 
+	private float invinsibleDuration = 0f;
 	private float waitFire = 0f;
 
 	public Player(int id, TinyParty game) {
@@ -46,6 +47,9 @@ public class Player extends Entity {
 		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
 		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
 
+		invinsibleDuration = Constants.PLAYER_INVINSIBLE_DURATION;
+
+		// TODO send position
 //		bulletSizeSpeedParameter = BulletSizeSpeedParameter.STATIC;
 //		bulletDistanceAmountParameter = BulletDistanceAmountParameter.LOW;
 //		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.HIGH;
@@ -57,6 +61,12 @@ public class Player extends Entity {
 		if(waitFire < 0f || MathUtils.isZero(waitFire)) {
 			waitFire = -1f;
 		}
+
+		invinsibleDuration -= delta;
+		if(invinsibleDuration < 0f) {
+			invinsibleDuration = 0f;
+		}
+
 		if(Gdx.input.justTouched() && waitFire < 0f) {
 			waitFire = bulletFrenquecyDamageParameter.frenquecy;
 
@@ -107,7 +117,12 @@ public class Player extends Entity {
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-		batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), body.getPosition().x, body.getPosition().y);
+		if((int)invinsibleDuration % 2 == 0) {
+			batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), body.getPosition().x, body.getPosition().y);
+		}
+		else {
+			batch.draw(game.getAssetManager().get(Asset.PLAYER_2.filename, Texture.class), body.getPosition().x, body.getPosition().y);
+		}
 	}
 
 	@Override
