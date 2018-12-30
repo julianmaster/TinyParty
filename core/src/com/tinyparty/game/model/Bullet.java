@@ -14,37 +14,42 @@ import com.tinyparty.game.view.Asset;
 public class Bullet extends Entity {
 
 	private final TinyParty game;
-	private Vector2 direction = null;
-	private boolean sourceOfFire = false;
+
+	private int playerId;
+	private boolean sourceOfFire;
+	private Vector2 direction;
 	private int size;
 	private float speed;
 	private float damage;
-
 	public float distance;
 
+	// Box2D
 	private Body body;
 
-	public Bullet(TinyParty game, Vector2 position, Vector2 direction, float angle, boolean sourceOfFire, int size, float speed, float damage, float distance) {
+	public Bullet(int playerId, boolean sourceOfFire, Vector2 position, Vector2 direction, float angle, int size, float speed, float damage, float distance, TinyParty game) {
 		super(-1);
+		this.playerId = playerId;
+		this.sourceOfFire = sourceOfFire;
 		this.game = game;
 		this.direction = direction;
-		this.sourceOfFire = sourceOfFire;
 		this.size = size;
 		this.speed = speed;
 		this.damage = damage;
 		this.distance = distance;
 
 		if(sourceOfFire) {
-			this.body = PhysicManager.createBox(position.x, position.y, 4f*size, 4f*size, angle, Constants.BULLET_MOVE_CATEGORY, Constants.BULLET_MOVE_MASK, false, true, this, game.getGameScreen().getWorld());
+			this.body = PhysicManager.createBox(position.x, position.y, 4f*size, 4f*size, angle, Constants.BULLET_MOVE_CATEGORY, Constants.BULLET_MOVE_MASK, false, true, true, this, game.getGameScreen().getWorld());
 		}
 		else {
-			this.body = PhysicManager.createBox(position.x, position.y, 4f*size, 4f*size, angle, Constants.OTHER_BULLET_CATEGORY, Constants.OTHER_BULLET_MOVE_MASK, false, true, this, game.getGameScreen().getWorld());
+			this.body = PhysicManager.createBox(position.x, position.y, 4f*size, 4f*size, angle, Constants.OTHER_BULLET_CATEGORY, Constants.OTHER_BULLET_MOVE_MASK, false, true, true, this, game.getGameScreen().getWorld());
 		}
 		body.setTransform(position.x, position.y, angle);
 
 		this.direction.scl(this.speed);
 		game.getGameScreen().getEntitiesToAdd().add(this);
 		// TODO send information to server
+
+
 	}
 
 	@Override
@@ -61,7 +66,7 @@ public class Bullet extends Entity {
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-		batch.draw(assetManager.get(Asset.STANDARD_BULLET.filename, Texture.class), body.getPosition().x - 2f, body.getPosition().y - 2f, 4f/2f, 4f/2f,
+		batch.draw(assetManager.get(Asset.STANDARD_BULLET.filename, Texture.class), body.getPosition().x - Constants.BULLET_WIDTH/2f, body.getPosition().y - Constants.BULLET_HEIGHT/2f, 4f/2f, 4f/2f,
 				4f, 4f, size, size, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, 4, 4, false, false);
 	}
 

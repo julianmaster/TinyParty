@@ -12,9 +12,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.tinyparty.game.TinyParty;
-import com.tinyparty.game.model.Entity;
-import com.tinyparty.game.model.Ground;
-import com.tinyparty.game.model.Player;
+import com.tinyparty.game.model.*;
 import com.tinyparty.game.physic.EntityContactListener;
 
 import java.util.ArrayList;
@@ -36,6 +34,7 @@ public class GameScreen extends ScreenAdapter {
 
 	// Box2D
 	private World world;
+	private BulletManager bulletManager;
 	private List<Body> bodiesToRemove = new ArrayList<>();
 	private boolean showDebugPhysics = false;
 	private Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
@@ -45,11 +44,12 @@ public class GameScreen extends ScreenAdapter {
 		lock.lock();
 		world = new World(new Vector2(), false);
 		world.setContactListener(new EntityContactListener(game));
+		bulletManager = new BulletManager(game);
 		lock.unlock();
 	}
 
-	public void init(int id) {
-		player = new Player(id, game);
+	public void init(int id, Vector2 position) {
+		player = new Player(id, position, game);
 		entitiesToAdd.add(player);
 	}
 
@@ -132,12 +132,50 @@ public class GameScreen extends ScreenAdapter {
 	public void dispose() {
 	}
 
+	public void addNewOtherPlayer(int id, Vector2 position) {
+		OtherPlayer otherPlayer = new OtherPlayer(id, position, game);
+		entitiesToAdd.add(otherPlayer);
+	}
+
+	public void changeOtherPlayerPosition(int id, Vector2 position) {
+		boolean found = false;
+		for(Entity entity : entities) {
+			if(entity instanceof OtherPlayer) {
+				OtherPlayer otherPlayer = (OtherPlayer)entity;
+				if(otherPlayer.getId() == id) {
+					otherPlayer.setPosition(position);
+					found = true;
+				}
+			}
+		}
+
+		if(!found) {
+			for(Entity entity : entitiesToAdd) {
+				if(entity instanceof OtherPlayer) {
+					OtherPlayer otherPlayer = (OtherPlayer)entity;
+					if(otherPlayer.getId() == id) {
+						otherPlayer.setPosition(position);
+						found = true;
+					}
+				}
+			}
+		}
+	}
+
 	public ReentrantLock getLock() {
 		return lock;
 	}
 
+	public Player getPlayer() {
+		return player;
+	}
+
 	public World getWorld() {
 		return world;
+	}
+
+	public BulletManager getBulletManager() {
+		return bulletManager;
 	}
 
 	public List<Entity> getEntitiesToRemove() {

@@ -5,6 +5,8 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.tinyparty.game.TinyParty;
+import com.tinyparty.game.model.Bullet;
+import com.tinyparty.game.model.Player;
 import com.tinyparty.game.view.GameScreen;
 
 public class EntityContactListener implements ContactListener {
@@ -23,26 +25,20 @@ public class EntityContactListener implements ContactListener {
 		GameScreen gameScreen = game.getGameScreen();
 
 		gameScreen.getLock().lock();
-//		if(objectA instanceof Bullet) {
-//			// Bullet vs Pillar/Arena
-//			if (objectB instanceof Pillar || objectB instanceof Arena) {
-//				bulletPillarArenaContact(objectA);
-//			}
-//			// Bullet vs Player
-//			else if(objectB instanceof Player) {
+		if(objectA instanceof Bullet) {
+			// Bullet vs Player
+			if(objectB instanceof Player) {
+				System.out.println("coucou 1");
 //				bulletPlayerContact(objectA, objectB);
-//			}
-//		}
-//		else if(objectB instanceof Bullet) {
-//			// Bullet vs Pillar/Arena
-//			if (objectA instanceof Pillar || objectA instanceof Arena) {
-//				bulletPillarArenaContact(objectB);
-//			}
-//			// Bullet vs Player
-//			else if(objectA instanceof Player) {
+			}
+		}
+		else if(objectB instanceof Bullet) {
+			// Bullet vs Player
+			if(objectA instanceof Player) {
+				System.out.println("coucou 2");
 //				bulletPlayerContact(objectB, objectA);
-//			}
-//		}
+			}
+		}
 		gameScreen.getLock().unlock();
 	}
 

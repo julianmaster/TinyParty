@@ -17,11 +17,11 @@ public class OtherPlayer extends Entity {
 	private final Vector2 size;
 	private Body body;
 
-	public OtherPlayer(int id, TinyParty game, Vector2 position) {
+	public OtherPlayer(int id, Vector2 position, TinyParty game) {
 		super(id);
 		this.game = game;
 		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
-		this.body = PhysicManager.createBox(position.x, position.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.OTHER_PLAYER_CATEGORY, Constants.OTHER_PLAYER_MASK, true, false, this, game.getGameScreen().getWorld());
+		this.body = PhysicManager.createBox(position.x, position.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.OTHER_PLAYER_CATEGORY, Constants.OTHER_PLAYER_MASK, true, false, true,this, game.getGameScreen().getWorld());
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class OtherPlayer extends Entity {
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-		batch.draw(assetManager.get(Asset.PLAYER.filename, Texture.class), body.getPosition().x - Constants.PLAYER_COLLISION_WIDTH / 2f, body.getPosition().y - Constants.PLAYER_COLLISION_HEIGHT / 2f);
+		batch.draw(assetManager.get(Asset.PLAYER.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
 	}
 
 	@Override

@@ -14,10 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tinyparty.game.network.TinyPartyClient;
-import com.tinyparty.game.view.Asset;
-import com.tinyparty.game.view.CustomColor;
-import com.tinyparty.game.view.GameScreen;
-import com.tinyparty.game.view.StartScreen;
+import com.tinyparty.game.view.*;
 
 public class TinyParty extends Game {
 	private SpriteBatch batch;
@@ -25,6 +22,7 @@ public class TinyParty extends Game {
 	private Viewport viewport;
 	private Stage stage;
 	private AssetManager assetManager;
+	private AnimationManager animationManager;
 	private BitmapFont fontBig;
 	private BitmapFont fontNormal;
 	private BitmapFont fontSmall;
@@ -42,6 +40,7 @@ public class TinyParty extends Game {
 		camera = new OrthographicCamera();
 		viewport = new FitViewport(Constants.CAMERA_WIDTH, Constants.CAMERA_HEIGHT, camera);
 		assetManager = new AssetManager();
+		animationManager = new AnimationManager();
 
 		client = new TinyPartyClient(this);
 
