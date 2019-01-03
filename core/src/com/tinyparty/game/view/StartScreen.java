@@ -13,15 +13,12 @@ import com.tinyparty.game.network.json.client.RequestJoinPartyJson;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class StartScreen extends ScreenAdapter {
 
 	private final TinyParty game;
 	private int kill = 0;
 	private int death = 0;
-
-	private final ReentrantLock lock = new ReentrantLock();
 
 	private TextActionButton goButton;
 
@@ -76,7 +73,11 @@ public class StartScreen extends ScreenAdapter {
 			colorIndex %= colors.size();
 		}
 
-		lock.lock();
+		game.getLock().lock();
+
+		camera.position.set(0 + Constants.CAMERA_WIDTH/2f,0 + Constants.CAMERA_HEIGHT/2f,0);
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
 
@@ -107,7 +108,7 @@ public class StartScreen extends ScreenAdapter {
 
 		batch.end();
 
-		lock.unlock();
+		game.getLock().unlock();
 	}
 
 	@Override
@@ -127,7 +128,19 @@ public class StartScreen extends ScreenAdapter {
 		return ( (float) ( (int) ((tmp - (int) tmp) >= 0.5f ? tmp + 1 : tmp) ) ) / pow;
 	}
 
-	public ReentrantLock getLock() {
-		return lock;
+	public int getKill() {
+		return kill;
+	}
+
+	public void setKill(int kill) {
+		this.kill = kill;
+	}
+
+	public int getDeath() {
+		return death;
+	}
+
+	public void setDeath(int death) {
+		this.death = death;
 	}
 }

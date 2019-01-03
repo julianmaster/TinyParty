@@ -24,8 +24,6 @@ public class GameScreen extends ScreenAdapter {
 
 	private final TinyParty game;
 
-	private ReentrantLock lock = new ReentrantLock();
-
 	private Ground ground;
 	private Player player;
 	private List<Entity> entities = new ArrayList<>();
@@ -41,21 +39,29 @@ public class GameScreen extends ScreenAdapter {
 
 	public GameScreen(TinyParty game) {
 		this.game = game;
-		lock.lock();
-		world = new World(new Vector2(), false);
-		world.setContactListener(new EntityContactListener(game));
+		game.getLock().lock();
+		ground = new Ground();
 		bulletManager = new BulletManager(game);
-		lock.unlock();
+		game.getLock().unlock();
 	}
 
 	public void init(int id, Vector2 position) {
-		player = new Player(id, position, game);
+		if(world != null) {
+			world.dispose();
+		}
+
+		if(player == null) {
+			player = new Player(id, game);
+		}
+
+		world = new World(new Vector2(), false);
+		world.setContactListener(new EntityContactListener(game));
+		player.setPosition(position);
 		entitiesToAdd.add(player);
 	}
 
 	@Override
 	public void show() {
-		ground = new Ground();
 	}
 
 	@Override
@@ -68,7 +74,7 @@ public class GameScreen extends ScreenAdapter {
 			showDebugPhysics = !showDebugPhysics;
 		}
 
-		lock.lock();
+		game.getLock().lock();
 
 		// Add entities
 		for(Entity entity : entitiesToAdd) {
@@ -120,16 +126,21 @@ public class GameScreen extends ScreenAdapter {
 		bodiesToRemove.clear();
 
 		world.step(1/60f, 6, 2);
-		lock.unlock();
+		game.getLock().unlock();
 	}
 
 	@Override
 	public void hide() {
-
+		entities.clear();
+		entitiesToAdd.clear();
+		entitiesToRemove.clear();
+		player = null;
 	}
 
 	@Override
 	public void dispose() {
+		debugRenderer.dispose();
+		world.dispose();
 	}
 
 	public void addNewOtherPlayer(int id, Vector2 position) {
@@ -162,8 +173,15 @@ public class GameScreen extends ScreenAdapter {
 		}
 	}
 
-	public ReentrantLock getLock() {
-		return lock;
+	public void removeOtherPlayer(int id) {
+		for(Entity entity : entities) {
+			if(entity instanceof OtherPlayer) {
+				OtherPlayer otherPlayer = (OtherPlayer)entity;
+				if(otherPlayer.getId() == id) {
+					otherPlayer.die();
+				}
+			}
+		}
 	}
 
 	public Player getPlayer() {

@@ -17,13 +17,14 @@ public class BulletManager {
 		this.game = game;
 	}
 
-	public void fire(int playerId, boolean sourceOfFire, Vector2 position, Vector3 worldClickCoords, BulletSizeSpeedParameter bulletSizeSpeedParameter, BulletDistanceAmountParameter bulletDistanceAmountParameter, BulletFrenquecyDamageParameter bulletFrenquecyDamageParameter) {
+	public void fire(int playerId, boolean sourceOfFire, Vector2 source, Vector3 worldClickCoords, BulletSizeSpeedParameter bulletSizeSpeedParameter, BulletDistanceAmountParameter bulletDistanceAmountParameter, BulletFrenquecyDamageParameter bulletFrenquecyDamageParameter) {
 		for(float offset : BulletAmountConfiguration.configuration.get(bulletDistanceAmountParameter.amount)) {
-			float angleRad = MathUtils.atan2(worldClickCoords.y - position.y + 3f, worldClickCoords.x - position.x);
+			float angleRad = MathUtils.atan2(worldClickCoords.y - source.y + 3f, worldClickCoords.x - source.x);
 			float angleDeg = angleRad * MathUtils.radiansToDegrees + offset;
 
 			Vector2 direction = new Vector2(MathUtils.cosDeg(angleDeg), MathUtils.sinDeg(angleDeg));
 
+			Vector2 position = new Vector2(source.x + 1f, source.y + 3f);
 			if(bulletSizeSpeedParameter == BulletSizeSpeedParameter.STATIC &&
 					(bulletDistanceAmountParameter == BulletDistanceAmountParameter.MEDIUM || bulletDistanceAmountParameter == BulletDistanceAmountParameter.LOW)) {
 				position.x += direction.x * BulletDistanceAmountParameter.LOW.distance * BulletSizeSpeedParameter.SLOW.speed;

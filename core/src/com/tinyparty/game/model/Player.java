@@ -36,13 +36,13 @@ public class Player extends Entity {
 	private float invinsibleDuration = 0f;
 	private float waitFire = 0f;
 
-	public Player(int id, Vector2 position, TinyParty game) {
+	public Player(int id, TinyParty game) {
 		super(id);
 		this.game = game;
 
 		this.life = 3;
 		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
-		this.oldPosition = position;
+		this.oldPosition = new Vector2();
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, true,this, game.getGameScreen().getWorld());
 
 		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
@@ -130,6 +130,11 @@ public class Player extends Entity {
 		return 0;
 	}
 
+	public void die() {
+		game.getGameScreen().getBodiesToRemove().add(body);
+		game.getGameScreen().getEntitiesToRemove().remove(this);
+	}
+
 	@Override
 	public int getId() {
 		return super.getId();
@@ -140,8 +145,20 @@ public class Player extends Entity {
 		return body.getPosition();
 	}
 
+	public void setPosition(Vector2 position) {
+		body.setTransform(position.x, position.y, 0f);
+	}
+
 	@Override
 	public Vector2 getSize() {
 		return size;
+	}
+
+	public int getLife() {
+		return life;
+	}
+
+	public void setLife(int life) {
+		this.life = life;
 	}
 }

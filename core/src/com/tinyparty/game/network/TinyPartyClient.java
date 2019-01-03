@@ -9,10 +9,7 @@ import com.github.czyzby.websocket.net.ExtendedNet;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.Player;
-import com.tinyparty.game.network.json.server.ResponseJoinPartyJson;
-import com.tinyparty.game.network.json.server.ResponseNewOtherPlayerJson;
-import com.tinyparty.game.network.json.server.ResponsePlayerFireJson;
-import com.tinyparty.game.network.json.server.ResponsePositionPlayerJson;
+import com.tinyparty.game.network.json.server.*;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,42 +34,43 @@ public class TinyPartyClient implements Disposable {
 		return new AbstractWebSocketListener() {
 			@Override
 			protected boolean onMessage(com.github.czyzby.websocket.WebSocket webSocket, Object response) throws WebSocketException {
+				game.getLock().lock();
 				if(response instanceof ResponseJoinPartyJson) {
 					ResponseJoinPartyJson responseJoinPartyJson = (ResponseJoinPartyJson)response;
-
-					game.getStartScreen().getLock().lock();
-					game.getGameScreen().getLock().lock();
 
 					game.getGameScreen().init(responseJoinPartyJson.id, responseJoinPartyJson.position);
 					for(int i = 0; i < responseJoinPartyJson.otherIds.length; i++) {
 						game.getGameScreen().addNewOtherPlayer(responseJoinPartyJson.otherIds[i], responseJoinPartyJson.otherPositions[i]);
 					}
 					game.setScreen(game.getGameScreen());
-
-					game.getGameScreen().getLock().unlock();
-					game.getStartScreen().getLock().unlock();
 				}
 				else if(response instanceof ResponseNewOtherPlayerJson) {
 					ResponseNewOtherPlayerJson responseNewOtherPlayerJson = (ResponseNewOtherPlayerJson)response;
 
-					game.getGameScreen().getLock().lock();
 					game.getGameScreen().addNewOtherPlayer(responseNewOtherPlayerJson.id, responseNewOtherPlayerJson.position);
-					game.getGameScreen().getLock().unlock();
 				}
 				else if(response instanceof ResponsePositionPlayerJson) {
 					ResponsePositionPlayerJson responsePositionPlayerJson = (ResponsePositionPlayerJson)response;
 
-					game.getGameScreen().getLock().lock();
 					game.getGameScreen().changeOtherPlayerPosition(responsePositionPlayerJson.id, responsePositionPlayerJson.position);
-					game.getGameScreen().getLock().unlock();
 				}
 				else if(response instanceof ResponsePlayerFireJson) {
 					ResponsePlayerFireJson responsePlayerFireJson = (ResponsePlayerFireJson)response;
 
-					game.getGameScreen().getLock().lock();
 					game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, responsePlayerFireJson.position, responsePlayerFireJson.worldClickCoords, responsePlayerFireJson.bulletSizeSpeedParameter, responsePlayerFireJson.bulletDistanceAmountParameter, responsePlayerFireJson.bulletFrenquecyDamageParameter);
-					game.getGameScreen().getLock().unlock();
 				}
+				else if(response instanceof ResponsePlayerDieJson) {
+					ResponsePlayerDieJson responsePlayerDieJson = (ResponsePlayerDieJson)response;
+
+					if(game.getGameScreen().getPlayer().getId() == responsePlayerDieJson.bulletIdPlayer) {
+						game.getStartScreen().setKill(game.getStartScreen().getKill()+1);
+					}
+				}
+				else if(response instanceof ResponseQuitPlayerJson) {
+					ResponseQuitPlayerJson responseQuitPlayerJson = (ResponseQuitPlayerJson)response;
+
+				}
+				game.getLock().unlock();
 				return FULLY_HANDLED;
 			}
 		};

@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tinyparty.game.network.TinyPartyClient;
 import com.tinyparty.game.view.*;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class TinyParty extends Game {
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
@@ -33,6 +35,8 @@ public class TinyParty extends Game {
 
 	private StartScreen startScreen;
 	private GameScreen gameScreen;
+
+	private ReentrantLock lock = new ReentrantLock();
 
 	@Override
 	public void create () {
@@ -136,6 +140,10 @@ public class TinyParty extends Game {
 
 	public TinyPartyClient getClient() {
 		return client;
+	}
+
+	public ReentrantLock getLock() {
+		return lock;
 	}
 
 	public StartScreen getStartScreen() {

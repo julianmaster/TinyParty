@@ -5,12 +5,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.github.czyzby.websocket.serialization.Serializer;
 import com.github.czyzby.websocket.serialization.impl.JsonSerializer;
 import com.tinyparty.game.network.json.client.RequestJoinPartyJson;
+import com.tinyparty.game.network.json.client.RequestPlayerDieJson;
 import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
 import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
-import com.tinyparty.game.network.json.server.ResponseJoinPartyJson;
-import com.tinyparty.game.network.json.server.ResponseNewOtherPlayerJson;
-import com.tinyparty.game.network.json.server.ResponsePlayerFireJson;
-import com.tinyparty.game.network.json.server.ResponsePositionPlayerJson;
+import com.tinyparty.game.network.json.server.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
@@ -56,7 +54,7 @@ public class TinyPartyServer {
 			// Create new Id for new player
 			int id;
 			do {
-				id = MathUtils.random(10000);
+				id = MathUtils.random(Integer.MAX_VALUE);
 			} while(players.containsKey(id));
 
 			// Search informations of others players
@@ -121,24 +119,44 @@ public class TinyPartyServer {
 				}
 			}
 		}
+		else if(request instanceof RequestPlayerDieJson) {
+			RequestPlayerDieJson requestPlayerDieJson = (RequestPlayerDieJson)request;
+
+			ResponsePlayerDieJson responsePlayerDieJson = new ResponsePlayerDieJson();
+			responsePlayerDieJson.id = requestPlayerDieJson.id;
+			responsePlayerDieJson.bulletIdPlayer = requestPlayerDieJson.bulletIdPlayer;
+
+			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+				if(player.getKey() != requestPlayerDieJson.id) {
+					player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerDieJson)));
+				}
+			}
+		}
 		lock.unlock();
 	}
 
 	private void handleSocketClosed(final ServerWebSocket webSocket, final Void frame) {
 		lock.lock();
 		webSockets.remove(webSocket);
-//		List<Integer> nums = new ArrayList<>();
-//		for(Map.Entry<Integer, Party> party : parties.entrySet()) {
-//			party.getValue().removePlayer(webSocket);
-//			if(party.getValue().getPlayers().isEmpty()) {
-//				nums.add(party.getKey());
-//			}
-//		}
-//		for(Integer num : nums) {
-//			parties.remove(num);
-//		}
 
-		// TODO manage player quit during party
+		Integer playerId = -1;
+
+		for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+			if(webSocket == player.getValue().left) {
+				playerId = player.getKey();
+			}
+		}
+
+		if(playerId != -1) {
+			players.remove(playerId);
+		}
+
+		ResponseQuitPlayerJson responseQuitPlayerJson = new ResponseQuitPlayerJson();
+		responseQuitPlayerJson.id = playerId;
+		for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+			player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseQuitPlayerJson)));
+		}
+
 		lock.unlock();
 	}
 

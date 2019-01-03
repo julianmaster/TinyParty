@@ -89,4 +89,8 @@ public class Bullet extends Entity {
 	public Vector2 getSize() {
 		return null;
 	}
+
+	public int getPlayerId() {
+		return playerId;
+	}
 }
