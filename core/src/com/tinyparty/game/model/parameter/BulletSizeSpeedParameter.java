@@ -2,8 +2,7 @@ package com.tinyparty.game.model.parameter;
 
 public enum BulletSizeSpeedParameter {
 	FAST(1, 140f),
-	SLOW(3, 60f),
-	STATIC(6, 0f);
+	SLOW(6, 60f);
 
 	public int size;
 	public float speed;

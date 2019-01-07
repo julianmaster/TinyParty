@@ -45,7 +45,8 @@ public class Player extends Entity {
 		this.oldPosition = new Vector2();
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, true,this, game.getGameScreen().getWorld());
 
-		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
+//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
+		bulletSizeSpeedParameter = BulletSizeSpeedParameter.SLOW;
 		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
 		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
 

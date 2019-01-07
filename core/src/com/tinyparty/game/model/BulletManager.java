@@ -23,14 +23,7 @@ public class BulletManager {
 			float angleDeg = angleRad * MathUtils.radiansToDegrees + offset;
 
 			Vector2 direction = new Vector2(MathUtils.cosDeg(angleDeg), MathUtils.sinDeg(angleDeg));
-
 			Vector2 position = new Vector2(source.x + 1f, source.y + 3f);
-			if(bulletSizeSpeedParameter == BulletSizeSpeedParameter.STATIC &&
-					(bulletDistanceAmountParameter == BulletDistanceAmountParameter.MEDIUM || bulletDistanceAmountParameter == BulletDistanceAmountParameter.LOW)) {
-				position.x += direction.x * BulletDistanceAmountParameter.LOW.distance * BulletSizeSpeedParameter.SLOW.speed;
-				position.y += direction.y * BulletDistanceAmountParameter.LOW.distance * BulletSizeSpeedParameter.SLOW.speed;
-			}
-
 			new Bullet(playerId, sourceOfFire, position, direction, angleDeg*MathUtils.degreesToRadians, bulletSizeSpeedParameter.size, bulletSizeSpeedParameter.speed, bulletFrenquecyDamageParameter.damage, bulletDistanceAmountParameter.distance, game);
 		}
 	}

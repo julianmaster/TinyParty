@@ -28,7 +28,7 @@ public class TinyPartyServer {
 	private final Serializer serializer = new JsonSerializer();
 	private final ReentrantLock lock = new ReentrantLock();
 
-	private List<ServerWebSocket> webSockets = new ArrayList<>();
+//	private List<ServerWebSocket> webSockets = new ArrayList<>();
 
 	private Map<Integer, MutablePair<ServerWebSocket, Vector2>> players = new HashMap<>();
 
@@ -49,13 +49,29 @@ public class TinyPartyServer {
 		if(request instanceof RequestJoinPartyJson) {
 			RequestJoinPartyJson requestJoinPartyJson = (RequestJoinPartyJson)request;
 
-			// TODO not create new ID if player has one before
+			// The id of player;
+			int id = -1;
 
-			// Create new Id for new player
-			int id;
-			do {
-				id = MathUtils.random(Integer.MAX_VALUE);
-			} while(players.containsKey(id));
+			boolean exist = false;
+			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+				if(player.getValue().left == webSocket) {
+					exist = true;
+					id = player.getKey();
+					break;
+				}
+			}
+
+			if(!exist) {
+				// Create new Id for new player
+				do {
+					id = MathUtils.random(100000);
+				} while(players.containsKey(id));
+			}
+
+			if(id == -1) {
+				System.err.println("Erreur de l'ID du joueur: "+id);
+				return;
+			}
 
 			// Search informations of others players
 			int[] otherIds = new int[players.size()];
@@ -137,7 +153,6 @@ public class TinyPartyServer {
 
 	private void handleSocketClosed(final ServerWebSocket webSocket, final Void frame) {
 		lock.lock();
-		webSockets.remove(webSocket);
 
 		Integer playerId = -1;
 

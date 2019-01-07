@@ -50,11 +50,10 @@ public class GameScreen extends ScreenAdapter {
 			world.dispose();
 		}
 
+		world = new World(new Vector2(), false);
 		if(player == null) {
 			player = new Player(id, game);
 		}
-
-		world = new World(new Vector2(), false);
 		world.setContactListener(new EntityContactListener(game));
 		player.setPosition(position);
 		entitiesToAdd.add(player);
