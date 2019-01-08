@@ -113,6 +113,8 @@ public class GameScreen extends ScreenAdapter {
 			entity.render(batch, assetManager);
 		}
 
+		// TODO show UI with life, player kill and death count and ratio
+
 		batch.end();
 
 		if(showDebugPhysics) {

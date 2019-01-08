@@ -29,8 +29,6 @@ public class EntityContactListener implements ContactListener {
 		Object objectA = contact.getFixtureA().getBody().getUserData();
 		Object objectB = contact.getFixtureB().getBody().getUserData();
 
-		GameScreen gameScreen = game.getGameScreen();
-
 		game.getLock().lock();
 		if(objectA instanceof Bullet) {
 			// Bullet vs Player
@@ -51,8 +49,9 @@ public class EntityContactListener implements ContactListener {
 		Bullet bullet = (Bullet) bulletObject;
 		Player player = (Player) playerObject;
 
-		if(player.getLife() > 0) {
-			player.setLife(player.getLife()-1);
+		if(player.getLife() > 0 && !player.isInvinsible()) {
+			player.touched();
+
 			if(player.getLife() == 0) {
 				player.die();
 
@@ -61,10 +60,8 @@ public class EntityContactListener implements ContactListener {
 				requestPlayerDieJson.bulletIdPlayer = bullet.getPlayerId();
 				game.getClient().send(requestPlayerDieJson);
 
-				game.getLock().lock();
 				game.getStartScreen().setDeath(game.getStartScreen().getDeath()+1);
 				game.setScreen(game.getStartScreen());
-				game.getLock().unlock();
 			}
 		}
 	}

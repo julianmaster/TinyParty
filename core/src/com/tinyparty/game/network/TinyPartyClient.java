@@ -57,7 +57,7 @@ public class TinyPartyClient implements Disposable {
 				else if(response instanceof ResponsePlayerFireJson) {
 					ResponsePlayerFireJson responsePlayerFireJson = (ResponsePlayerFireJson)response;
 
-					game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, responsePlayerFireJson.position, responsePlayerFireJson.worldClickCoords, responsePlayerFireJson.bulletSizeSpeedParameter, responsePlayerFireJson.bulletDistanceAmountParameter, responsePlayerFireJson.bulletFrenquecyDamageParameter);
+					game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, responsePlayerFireJson.position, responsePlayerFireJson.worldClickCoords, responsePlayerFireJson.bulletSizeSpeedParameter, responsePlayerFireJson.bulletDistanceAmountParameter);
 				}
 				else if(response instanceof ResponsePlayerDieJson) {
 					ResponsePlayerDieJson responsePlayerDieJson = (ResponsePlayerDieJson)response;

@@ -85,6 +85,7 @@ public class TinyPartyServer {
 			}
 
 			// Adding new player
+			// TODO fix the init player position
 			Vector2 position = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
 			players.put(id, new MutablePair<>(webSocket, position));
 
@@ -127,7 +128,6 @@ public class TinyPartyServer {
 			responsePlayerFireJson.worldClickCoords = requestPlayerFireJson.worldClickCoords;
 			responsePlayerFireJson.bulletSizeSpeedParameter = requestPlayerFireJson.bulletSizeSpeedParameter;
 			responsePlayerFireJson.bulletDistanceAmountParameter = requestPlayerFireJson.bulletDistanceAmountParameter;
-			responsePlayerFireJson.bulletFrenquecyDamageParameter = requestPlayerFireJson.bulletFrenquecyDamageParameter;
 
 			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
 				if(player.getKey() != requestPlayerFireJson.idPlayer) {

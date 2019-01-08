@@ -20,13 +20,12 @@ public class Bullet extends Entity {
 	private Vector2 direction;
 	private int size;
 	private float speed;
-	private float damage;
 	public float distance;
 
 	// Box2D
 	private Body body;
 
-	public Bullet(int playerId, boolean sourceOfFire, Vector2 position, Vector2 direction, float angle, int size, float speed, float damage, float distance, TinyParty game) {
+	public Bullet(int playerId, boolean sourceOfFire, Vector2 position, Vector2 direction, float angle, int size, float speed, float distance, TinyParty game) {
 		super(-1);
 		this.playerId = playerId;
 		this.sourceOfFire = sourceOfFire;
@@ -34,7 +33,6 @@ public class Bullet extends Entity {
 		this.direction = direction;
 		this.size = size;
 		this.speed = speed;
-		this.damage = damage;
 		this.distance = distance;
 
 		if(sourceOfFire) {
@@ -47,9 +45,6 @@ public class Bullet extends Entity {
 
 		this.direction.scl(this.speed);
 		game.getGameScreen().getEntitiesToAdd().add(this);
-		// TODO send information to server
-
-
 	}
 
 	@Override

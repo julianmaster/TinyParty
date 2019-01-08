@@ -11,9 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
-import com.tinyparty.game.model.parameter.BulletAmountConfiguration;
 import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
-import com.tinyparty.game.model.parameter.BulletFrenquecyDamageParameter;
 import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
 import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
 import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
@@ -31,9 +29,11 @@ public class Player extends Entity {
 
 	private BulletSizeSpeedParameter bulletSizeSpeedParameter;
 	private BulletDistanceAmountParameter bulletDistanceAmountParameter;
-	private BulletFrenquecyDamageParameter bulletFrenquecyDamageParameter;
 
+	private boolean invinsible = false;
 	private float invinsibleDuration = 0f;
+	private boolean white = false;
+	private float changeColor = 0f;
 	private float waitFire = 0f;
 
 	public Player(int id, TinyParty game) {
@@ -45,11 +45,11 @@ public class Player extends Entity {
 		this.oldPosition = new Vector2();
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, true,this, game.getGameScreen().getWorld());
 
-//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
-		bulletSizeSpeedParameter = BulletSizeSpeedParameter.SLOW;
+		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
+//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.SLOW;
 		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
-		bulletFrenquecyDamageParameter = BulletFrenquecyDamageParameter.values()[MathUtils.random(BulletFrenquecyDamageParameter.values().length-1)];
 
+		invinsible = true;
 		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
 	}
 
@@ -60,18 +60,27 @@ public class Player extends Entity {
 			waitFire = -1f;
 		}
 
-		invinsibleDuration -= delta;
-		if(invinsibleDuration < 0f) {
-			invinsibleDuration = 0f;
+		if(invinsible) {
+			invinsibleDuration -= delta;
+			changeColor -= delta;
+			if(invinsibleDuration < 0f) {
+				invinsible = false;
+			}
+			else {
+				if(changeColor < 0f) {
+					changeColor = Constants.PLAYER_CHANGE_COLOR;
+					white = !white;
+				}
+			}
 		}
 
 		if(Gdx.input.justTouched() && waitFire < 0f) {
-			waitFire = bulletFrenquecyDamageParameter.frenquecy;
+			waitFire = Constants.BULLET_FREQUENCY;
 
 			Vector3 screenClickCoords = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
 			Vector3 worldClickCoords = game.getCamera().unproject(screenClickCoords);
 
-			game.getGameScreen().getBulletManager().fire(getId(), true, body.getPosition(), worldClickCoords, bulletSizeSpeedParameter, bulletDistanceAmountParameter, bulletFrenquecyDamageParameter);
+			game.getGameScreen().getBulletManager().fire(getId(), true, body.getPosition(), worldClickCoords, bulletSizeSpeedParameter, bulletDistanceAmountParameter);
 
 			RequestPlayerFireJson requestPlayerFireJson = new RequestPlayerFireJson();
 			requestPlayerFireJson.idPlayer = getId();
@@ -79,7 +88,6 @@ public class Player extends Entity {
 			requestPlayerFireJson.worldClickCoords = worldClickCoords;
 			requestPlayerFireJson.bulletSizeSpeedParameter = bulletSizeSpeedParameter;
 			requestPlayerFireJson.bulletDistanceAmountParameter = bulletDistanceAmountParameter;
-			requestPlayerFireJson.bulletFrenquecyDamageParameter = bulletFrenquecyDamageParameter;
 			game.getClient().send(requestPlayerFireJson);
 		}
 
@@ -113,12 +121,13 @@ public class Player extends Entity {
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-		if((int)invinsibleDuration % 2 == 0) {
-			batch.draw(game.getAssetManager().get(Asset.PLAYER.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
+		Asset asset = Asset.PLAYER;
+
+		if(invinsible && white) {
+			asset = Asset.PLAYER_2;
 		}
-		else {
-			batch.draw(game.getAssetManager().get(Asset.PLAYER_2.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
-		}
+
+		batch.draw(game.getAssetManager().get(asset.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
 	}
 
 	@Override
@@ -129,6 +138,16 @@ public class Player extends Entity {
 	@Override
 	public int compareTo(Object o) {
 		return 0;
+	}
+
+	public void touched() {
+		life -= 1;
+		invinsible = true;
+		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		changeColor = Constants.PLAYER_CHANGE_COLOR;
+		white = true;
+
+		// TODO send invinsible to other player for show to other player
 	}
 
 	public void die() {
@@ -161,5 +180,9 @@ public class Player extends Entity {
 
 	public void setLife(int life) {
 		this.life = life;
+	}
+
+	public boolean isInvinsible() {
+		return invinsible;
 	}
 }
