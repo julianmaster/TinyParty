@@ -164,12 +164,11 @@ public class TinyPartyServer {
 
 		if(playerId != -1) {
 			players.remove(playerId);
-		}
-
-		ResponseQuitPlayerJson responseQuitPlayerJson = new ResponseQuitPlayerJson();
-		responseQuitPlayerJson.id = playerId;
-		for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
-			player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseQuitPlayerJson)));
+			ResponseQuitPlayerJson responseQuitPlayerJson = new ResponseQuitPlayerJson();
+			responseQuitPlayerJson.id = playerId;
+			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+				player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseQuitPlayerJson)));
+			}
 		}
 
 		lock.unlock();

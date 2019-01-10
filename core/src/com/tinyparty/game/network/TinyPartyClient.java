@@ -68,7 +68,7 @@ public class TinyPartyClient implements Disposable {
 				}
 				else if(response instanceof ResponseQuitPlayerJson) {
 					ResponseQuitPlayerJson responseQuitPlayerJson = (ResponseQuitPlayerJson)response;
-
+					game.getGameScreen().removeOtherPlayer(responseQuitPlayerJson.id);
 				}
 				game.getLock().unlock();
 				return FULLY_HANDLED;
