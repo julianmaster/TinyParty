@@ -185,6 +185,28 @@ public class GameScreen extends ScreenAdapter {
 		}
 	}
 
+	public void changeOtherPlayerInvinsible(int id) {
+		for(Entity entity : entities) {
+			if(entity instanceof OtherPlayer) {
+				OtherPlayer otherPlayer = (OtherPlayer)entity;
+				if(otherPlayer.getId() == id) {
+					otherPlayer.touched();
+				}
+			}
+		}
+	}
+
+	public void otherPlayerDie(int id) {
+		for(Entity entity : entities) {
+			if(entity instanceof OtherPlayer) {
+				OtherPlayer otherPlayer = (OtherPlayer)entity;
+				if(otherPlayer.getId() == id) {
+					otherPlayer.die();
+				}
+			}
+		}
+	}
+
 	public Player getPlayer() {
 		return player;
 	}

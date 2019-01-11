@@ -17,6 +17,11 @@ public class OtherPlayer extends Entity {
 	private final Vector2 size;
 	private Body body;
 
+	private boolean invinsible = false;
+	private float invinsibleDuration = 0f;
+	private boolean white = false;
+	private float changeColor = 0f;
+
 	public OtherPlayer(int id, Vector2 position, TinyParty game) {
 		super(id);
 		this.game = game;
@@ -26,17 +31,42 @@ public class OtherPlayer extends Entity {
 
 	@Override
 	public void update(float delta) {
-
+		if(invinsible) {
+			invinsibleDuration -= delta;
+			changeColor -= delta;
+			if(invinsibleDuration < 0f) {
+				invinsible = false;
+			}
+			else {
+				if(changeColor < 0f) {
+					changeColor = Constants.PLAYER_CHANGE_COLOR;
+					white = !white;
+				}
+			}
+		}
 	}
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager) {
-		batch.draw(assetManager.get(Asset.PLAYER.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
+		Asset asset = Asset.PLAYER;
+
+		if(invinsible && white) {
+			asset = Asset.PLAYER_2;
+		}
+
+		batch.draw(assetManager.get(asset.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
 	}
 
 	@Override
 	public void renderShadow(Batch batch, AssetManager assetManager) {
 
+	}
+
+	public void touched() {
+		invinsible = true;
+		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		changeColor = Constants.PLAYER_CHANGE_COLOR;
+		white = true;
 	}
 
 	public void die() {

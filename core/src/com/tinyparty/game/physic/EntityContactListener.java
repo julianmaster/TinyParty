@@ -8,6 +8,7 @@ import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.Bullet;
 import com.tinyparty.game.model.Player;
 import com.tinyparty.game.network.json.client.RequestPlayerDieJson;
+import com.tinyparty.game.network.json.client.RequestPlayerInvinsibleJson;
 import com.tinyparty.game.view.GameScreen;
 import com.tinyparty.game.view.StartScreen;
 
@@ -62,6 +63,11 @@ public class EntityContactListener implements ContactListener {
 
 				game.getStartScreen().setDeath(game.getStartScreen().getDeath()+1);
 				game.setScreen(game.getStartScreen());
+			}
+			else {
+				RequestPlayerInvinsibleJson requestPlayerInvinsibleJson = new RequestPlayerInvinsibleJson();
+				requestPlayerInvinsibleJson.idPlayer = player.getId();
+				game.getClient().send(requestPlayerInvinsibleJson);
 			}
 		}
 	}

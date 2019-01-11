@@ -146,8 +146,6 @@ public class Player extends Entity {
 		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
 		changeColor = Constants.PLAYER_CHANGE_COLOR;
 		white = true;
-
-		// TODO send invinsible to other player for show to other player
 	}
 
 	public void die() {

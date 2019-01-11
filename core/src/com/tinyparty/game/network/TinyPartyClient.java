@@ -8,7 +8,6 @@ import com.github.czyzby.websocket.data.WebSocketException;
 import com.github.czyzby.websocket.net.ExtendedNet;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
-import com.tinyparty.game.model.Player;
 import com.tinyparty.game.network.json.server.*;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -59,12 +58,18 @@ public class TinyPartyClient implements Disposable {
 
 					game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, responsePlayerFireJson.position, responsePlayerFireJson.worldClickCoords, responsePlayerFireJson.bulletSizeSpeedParameter, responsePlayerFireJson.bulletDistanceAmountParameter);
 				}
+				else if(response instanceof ResponsePlayerInvinsibleJson) {
+					ResponsePlayerInvinsibleJson responsePlayerInvinsibleJson = (ResponsePlayerInvinsibleJson)response;
+
+					game.getGameScreen().changeOtherPlayerInvinsible(responsePlayerInvinsibleJson.idPlayer);
+				}
 				else if(response instanceof ResponsePlayerDieJson) {
 					ResponsePlayerDieJson responsePlayerDieJson = (ResponsePlayerDieJson)response;
 
 					if(game.getGameScreen().getPlayer().getId() == responsePlayerDieJson.bulletIdPlayer) {
 						game.getStartScreen().setKill(game.getStartScreen().getKill()+1);
 					}
+					game.getGameScreen().otherPlayerDie(responsePlayerDieJson.id);
 				}
 				else if(response instanceof ResponseQuitPlayerJson) {
 					ResponseQuitPlayerJson responseQuitPlayerJson = (ResponseQuitPlayerJson)response;

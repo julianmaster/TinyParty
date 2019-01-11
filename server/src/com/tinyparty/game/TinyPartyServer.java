@@ -4,10 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.czyzby.websocket.serialization.Serializer;
 import com.github.czyzby.websocket.serialization.impl.JsonSerializer;
-import com.tinyparty.game.network.json.client.RequestJoinPartyJson;
-import com.tinyparty.game.network.json.client.RequestPlayerDieJson;
-import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
-import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
+import com.tinyparty.game.network.json.client.*;
 import com.tinyparty.game.network.json.server.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -51,12 +48,14 @@ public class TinyPartyServer {
 
 			// The id of player;
 			int id = -1;
+			int playerSize = players.size();
 
 			boolean exist = false;
 			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
 				if(player.getValue().left == webSocket) {
 					exist = true;
 					id = player.getKey();
+					playerSize--;
 					break;
 				}
 			}
@@ -74,8 +73,8 @@ public class TinyPartyServer {
 			}
 
 			// Search informations of others players
-			int[] otherIds = new int[players.size()];
-			Vector2[] otherPositions = new Vector2[players.size()];
+			int[] otherIds = new int[playerSize];
+			Vector2[] otherPositions = new Vector2[playerSize];
 			int index = 0;
 			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
 				if(player.getKey() != id) {
@@ -85,9 +84,13 @@ public class TinyPartyServer {
 			}
 
 			// Adding new player
-			// TODO fix the init player position
 			Vector2 position = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
-			players.put(id, new MutablePair<>(webSocket, position));
+			if(!exist) {
+				players.put(id, new MutablePair<>(webSocket, position));
+			}
+			else {
+				players.get(id).setRight(position);
+			}
 
 			ResponseJoinPartyJson responseJoinPartyJson = new ResponseJoinPartyJson();
 			responseJoinPartyJson.id = id;
@@ -132,6 +135,18 @@ public class TinyPartyServer {
 			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
 				if(player.getKey() != requestPlayerFireJson.idPlayer) {
 					player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerFireJson)));
+				}
+			}
+		}
+		else if(request instanceof RequestPlayerInvinsibleJson) {
+			RequestPlayerInvinsibleJson requestPlayerInvinsibleJson = (RequestPlayerInvinsibleJson)request;
+
+			ResponsePlayerInvinsibleJson responsePlayerInvinsibleJson = new ResponsePlayerInvinsibleJson();
+			responsePlayerInvinsibleJson.idPlayer = requestPlayerInvinsibleJson.idPlayer;
+
+			for(Map.Entry<Integer, MutablePair<ServerWebSocket, Vector2>> player : players.entrySet()) {
+				if(player.getKey() != requestPlayerInvinsibleJson.idPlayer) {
+					player.getValue().left.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerInvinsibleJson)));
 				}
 			}
 		}
