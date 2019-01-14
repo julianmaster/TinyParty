@@ -62,7 +62,7 @@ public class EntityContactListener implements ContactListener {
 				game.getClient().send(requestPlayerDieJson);
 
 				game.getStartScreen().setDeath(game.getStartScreen().getDeath()+1);
-				game.setScreen(game.getStartScreen());
+				game.getGameScreen().setLoose(true);
 			}
 			else {
 				RequestPlayerInvinsibleJson requestPlayerInvinsibleJson = new RequestPlayerInvinsibleJson();

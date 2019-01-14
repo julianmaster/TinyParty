@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.*;
 import com.tinyparty.game.physic.EntityContactListener;
@@ -26,6 +27,7 @@ public class GameScreen extends ScreenAdapter {
 
 	private Ground ground;
 	private Player player;
+	private boolean loose = false;
 	private List<Entity> entities = new ArrayList<>();
 	private List<Entity> entitiesToAdd = new ArrayList<>();
 	private List<Entity> entitiesToRemove = new ArrayList<>();
@@ -46,15 +48,11 @@ public class GameScreen extends ScreenAdapter {
 	}
 
 	public void init(int id, Vector2 position) {
-		if(world != null) {
-			world.dispose();
-		}
-
+		loose = false;
 		world = new World(new Vector2(), false);
-		if(player == null) {
-			player = new Player(id, game);
-		}
 		world.setContactListener(new EntityContactListener(game));
+
+		player = new Player(id, game);
 		player.setPosition(position);
 		entitiesToAdd.add(player);
 	}
@@ -74,6 +72,17 @@ public class GameScreen extends ScreenAdapter {
 		}
 
 		game.getLock().lock();
+
+		/**
+		 * Player loose the game
+		 */
+		if(loose) {
+			// Switch screen
+			game.setScreen(game.getStartScreen());
+			// Unlock
+			game.getLock().unlock();
+			return;
+		}
 
 		// Add entities
 		for(Entity entity : entitiesToAdd) {
@@ -132,10 +141,17 @@ public class GameScreen extends ScreenAdapter {
 
 	@Override
 	public void hide() {
+		game.getLock().lock();
+
+		world.dispose();
+		world = null;
+
 		entities.clear();
 		entitiesToAdd.clear();
 		entitiesToRemove.clear();
+		bodiesToRemove.clear();
 		player = null;
+		game.getLock().unlock();
 	}
 
 	@Override
@@ -147,6 +163,7 @@ public class GameScreen extends ScreenAdapter {
 	public void addNewOtherPlayer(int id, Vector2 position) {
 		OtherPlayer otherPlayer = new OtherPlayer(id, position, game);
 		entitiesToAdd.add(otherPlayer);
+		otherPlayer.touched();
 	}
 
 	public void changeOtherPlayerPosition(int id, Vector2 position) {
@@ -205,6 +222,10 @@ public class GameScreen extends ScreenAdapter {
 				}
 			}
 		}
+	}
+
+	public void setLoose(boolean loose) {
+		this.loose = loose;
 	}
 
 	public Player getPlayer() {

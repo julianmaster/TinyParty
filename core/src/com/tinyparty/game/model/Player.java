@@ -34,7 +34,7 @@ public class Player extends Entity {
 	private float invinsibleDuration = 0f;
 	private boolean white = false;
 	private float changeColor = 0f;
-	private float waitFire = 0f;
+	private float waitFire = Constants.BULLET_FREQUENCY;
 
 	public Player(int id, TinyParty game) {
 		super(id);
@@ -46,11 +46,7 @@ public class Player extends Entity {
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, true,this, game.getGameScreen().getWorld());
 
 		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
-//		bulletSizeSpeedParameter = BulletSizeSpeedParameter.SLOW;
 		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
-
-		invinsible = true;
-		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
 	}
 
 	@Override
@@ -165,6 +161,11 @@ public class Player extends Entity {
 
 	public void setPosition(Vector2 position) {
 		body.setTransform(position.x, position.y, 0f);
+	}
+
+	@Override
+	public Body getBody() {
+		return body;
 	}
 
 	@Override

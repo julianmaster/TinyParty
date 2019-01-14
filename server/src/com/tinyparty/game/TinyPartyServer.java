@@ -25,8 +25,6 @@ public class TinyPartyServer {
 	private final Serializer serializer = new JsonSerializer();
 	private final ReentrantLock lock = new ReentrantLock();
 
-//	private List<ServerWebSocket> webSockets = new ArrayList<>();
-
 	private Map<Integer, MutablePair<ServerWebSocket, Vector2>> players = new HashMap<>();
 
 	private void launch() {
@@ -84,7 +82,7 @@ public class TinyPartyServer {
 			}
 
 			// Adding new player
-			Vector2 position = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f);
+			Vector2 position = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f); // TODO fix player start location
 			if(!exist) {
 				players.put(id, new MutablePair<>(webSocket, position));
 			}
@@ -111,6 +109,8 @@ public class TinyPartyServer {
 		}
 		else if(request instanceof RequestPositionPlayerJson) {
 			RequestPositionPlayerJson requestPositionPlayerJson = (RequestPositionPlayerJson)request;
+
+			players.get(requestPositionPlayerJson.id).setRight(requestPositionPlayerJson.position);
 
 			ResponsePositionPlayerJson responsePositionPlayerJson = new ResponsePositionPlayerJson();
 			responsePositionPlayerJson.id = requestPositionPlayerJson.id;

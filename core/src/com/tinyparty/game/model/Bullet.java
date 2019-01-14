@@ -81,6 +81,11 @@ public class Bullet extends Entity {
 	}
 
 	@Override
+	public Body getBody() {
+		return body;
+	}
+
+	@Override
 	public Vector2 getSize() {
 		return null;
 	}

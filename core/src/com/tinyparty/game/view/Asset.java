@@ -15,7 +15,7 @@ public enum Asset {
 	GROUND5("ground5.png"),
 	GROUND6("ground6.png"),
 	GROUND7("ground7.png"),
-	PLAYER("player.png"),
+	PLAYER("player.png"), // TODO change sprite to new one
 	PLAYER_2("player_2.png"),
 	STANDARD_BULLET("standard_bullet.png"),
 

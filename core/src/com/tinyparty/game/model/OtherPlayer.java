@@ -27,6 +27,11 @@ public class OtherPlayer extends Entity {
 		this.game = game;
 		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
 		this.body = PhysicManager.createBox(position.x, position.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.OTHER_PLAYER_CATEGORY, Constants.OTHER_PLAYER_MASK, true, false, true,this, game.getGameScreen().getWorld());
+
+		invinsible = true;
+		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		white = true;
+		changeColor = Constants.PLAYER_CHANGE_COLOR;
 	}
 
 	@Override
@@ -65,8 +70,8 @@ public class OtherPlayer extends Entity {
 	public void touched() {
 		invinsible = true;
 		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
-		changeColor = Constants.PLAYER_CHANGE_COLOR;
 		white = true;
+		changeColor = Constants.PLAYER_CHANGE_COLOR;
 	}
 
 	public void die() {
@@ -81,6 +86,11 @@ public class OtherPlayer extends Entity {
 
 	public void setPosition(Vector2 position) {
 		body.setTransform(position.x, position.y, 0f);
+	}
+
+	@Override
+	public Body getBody() {
+		return body;
 	}
 
 	@Override
