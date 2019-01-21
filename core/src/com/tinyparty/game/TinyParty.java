@@ -1,6 +1,5 @@
 package com.tinyparty.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,7 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tinyparty.game.network.TinyPartyClient;
-import com.tinyparty.game.view.*;
+import com.tinyparty.game.utils.AnimationManager;
+import com.tinyparty.game.view.Asset;
+import com.tinyparty.game.view.CustomColor;
+import com.tinyparty.game.view.GameScreen;
+import com.tinyparty.game.view.StartScreen;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -80,11 +83,28 @@ public class TinyParty extends Game {
 		assetManager.load(Asset.GROUND5.filename, Texture.class);
 		assetManager.load(Asset.GROUND6.filename, Texture.class);
 		assetManager.load(Asset.GROUND7.filename, Texture.class);
-		assetManager.load(Asset.PLAYER.filename, Texture.class);
-		assetManager.load(Asset.PLAYER_2.filename, Texture.class);
 		assetManager.load(Asset.STANDARD_BULLET.filename, Texture.class);
-
+		assetManager.load(Asset.RED_PLAYER.filename, Texture.class);
+		assetManager.load(Asset.RED_PLAYER_2.filename, Texture.class);
+		assetManager.load(Asset.RED_HEART.filename, Texture.class);
+		assetManager.load(Asset.BLUE_PLAYER.filename, Texture.class);
+		assetManager.load(Asset.BLUE_PLAYER_2.filename, Texture.class);
+		assetManager.load(Asset.BLUE_HEART.filename, Texture.class);
+		assetManager.load(Asset.GREEN_PLAYER.filename, Texture.class);
+		assetManager.load(Asset.GREEN_PLAYER_2.filename, Texture.class);
+		assetManager.load(Asset.GREEN_HEART.filename, Texture.class);
 		assetManager.finishLoading();
+
+		animationManager.load(Asset.RED_PLAYER.filename, assetManager.get(Asset.RED_PLAYER.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		animationManager.load(Asset.RED_PLAYER_2.filename, assetManager.get(Asset.RED_PLAYER_2.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		animationManager.load(Asset.BLUE_PLAYER.filename, assetManager.get(Asset.BLUE_PLAYER.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		animationManager.load(Asset.BLUE_PLAYER_2.filename, assetManager.get(Asset.BLUE_PLAYER_2.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		animationManager.load(Asset.GREEN_PLAYER.filename, assetManager.get(Asset.GREEN_PLAYER.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+		animationManager.load(Asset.GREEN_PLAYER_2.filename, assetManager.get(Asset.GREEN_PLAYER_2.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
+
+		animationManager.load(Asset.RED_HEART.filename, assetManager.get(Asset.RED_HEART.filename), 0.120f, Constants.HEART_WIDTH, Constants.HEART_HEIGHT);
+		animationManager.load(Asset.BLUE_HEART.filename, assetManager.get(Asset.BLUE_HEART.filename), 0.120f, Constants.HEART_WIDTH, Constants.HEART_HEIGHT);
+		animationManager.load(Asset.GREEN_HEART.filename, assetManager.get(Asset.GREEN_HEART.filename), 0.120f, Constants.HEART_WIDTH, Constants.HEART_HEIGHT);
 	}
 
 	@Override
@@ -120,6 +140,10 @@ public class TinyParty extends Game {
 
 	public AssetManager getAssetManager() {
 		return assetManager;
+	}
+
+	public AnimationManager getAnimationManager() {
+		return animationManager;
 	}
 
 	public BitmapFont getFontBig() {

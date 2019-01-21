@@ -9,6 +9,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.physic.PhysicManager;
+import com.tinyparty.game.utils.AnimationManager;
 import com.tinyparty.game.view.Asset;
 
 public class Bullet extends Entity {
@@ -60,13 +61,13 @@ public class Bullet extends Entity {
 	}
 
 	@Override
-	public void render(Batch batch, AssetManager assetManager) {
+	public void render(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
 		batch.draw(assetManager.get(Asset.STANDARD_BULLET.filename, Texture.class), body.getPosition().x - Constants.BULLET_WIDTH/2f, body.getPosition().y - Constants.BULLET_HEIGHT/2f, 4f/2f, 4f/2f,
 				4f, 4f, size, size, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, 4, 4, false, false);
 	}
 
 	@Override
-	public void renderShadow(Batch batch, AssetManager assetManager) {
+	public void renderShadow(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
 
 	}
 

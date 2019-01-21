@@ -31,6 +31,7 @@ public class EntityContactListener implements ContactListener {
 		Object objectB = contact.getFixtureB().getBody().getUserData();
 
 		game.getLock().lock();
+		System.out.println("EntityContactListener");
 		if(objectA instanceof Bullet) {
 			// Bullet vs Player
 			if(objectB instanceof Player) {

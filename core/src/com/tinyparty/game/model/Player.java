@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -16,13 +17,16 @@ import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
 import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
 import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
 import com.tinyparty.game.physic.PhysicManager;
+import com.tinyparty.game.utils.AnimationManager;
 import com.tinyparty.game.view.Asset;
 
 public class Player extends Entity {
 
 	private final TinyParty game;
 
-	private int life = 3;
+	private int life;
+	private PlayerColor playerColor;
+	private boolean horizontalFlip;
 	private final Vector2 size;
 	private Vector2 oldPosition;
 	private Body body;
@@ -36,14 +40,19 @@ public class Player extends Entity {
 	private float changeColor = 0f;
 	private float waitFire = Constants.BULLET_FREQUENCY;
 
-	public Player(int id, TinyParty game) {
+	private float stateTime;
+
+	public Player(int id, PlayerColor playerColor, boolean horizontalFlip, TinyParty game) {
 		super(id);
 		this.game = game;
+		this.playerColor = playerColor;
+		this.horizontalFlip = horizontalFlip;
 
 		this.life = 3;
 		this.size = new Vector2(Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT);
 		this.oldPosition = new Vector2();
 		this.body = PhysicManager.createBox(oldPosition.x, oldPosition.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.PLAYER_CATEGORY, Constants.PLAYER_MASK, false, false, true,this, game.getGameScreen().getWorld());
+		this.stateTime = 0f;
 
 		bulletSizeSpeedParameter = BulletSizeSpeedParameter.values()[MathUtils.random(BulletSizeSpeedParameter.values().length-1)];
 		bulletDistanceAmountParameter = BulletDistanceAmountParameter.values()[MathUtils.random(BulletDistanceAmountParameter.values().length-1)];
@@ -51,6 +60,7 @@ public class Player extends Entity {
 
 	@Override
 	public void update(float delta) {
+		stateTime+= delta;
 		waitFire -= delta;
 		if(waitFire < 0f || MathUtils.isZero(waitFire)) {
 			waitFire = -1f;
@@ -96,9 +106,11 @@ public class Player extends Entity {
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.Q)) {
 			x -= 1f;
+			horizontalFlip = false;
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
 			x += 1f;
+			horizontalFlip = true;
 		}
 
 		if(x != 0f && y != 0f) {
@@ -111,23 +123,31 @@ public class Player extends Entity {
 			RequestPositionPlayerJson requestPositionPlayerJson = new RequestPositionPlayerJson();
 			requestPositionPlayerJson.id = getId();
 			requestPositionPlayerJson.position = body.getPosition();
+			requestPositionPlayerJson.horizontalFlip = horizontalFlip;
 			game.getClient().send(requestPositionPlayerJson);
 		}
 	}
 
 	@Override
-	public void render(Batch batch, AssetManager assetManager) {
-		Asset asset = Asset.PLAYER;
+	public void render(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
+		TextureRegion currentFrame = (TextureRegion)animationManager.get(playerColor.player.filename).getKeyFrame(stateTime, true);
 
 		if(invinsible && white) {
-			asset = Asset.PLAYER_2;
+			currentFrame = (TextureRegion)animationManager.get(playerColor.player2.filename).getKeyFrame(stateTime, true);
 		}
 
-		batch.draw(game.getAssetManager().get(asset.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
+		if(horizontalFlip && !currentFrame.isFlipX()) {
+			currentFrame.flip(horizontalFlip == true, false);
+		}
+		else if(!horizontalFlip && currentFrame.isFlipX()) {
+			currentFrame.flip(horizontalFlip != true, false);
+		}
+
+		batch.draw(currentFrame, body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
 	}
 
 	@Override
-	public void renderShadow(Batch batch, AssetManager assetManager) {
+	public void renderShadow(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
 
 	}
 

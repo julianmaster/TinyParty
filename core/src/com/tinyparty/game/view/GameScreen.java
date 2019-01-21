@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.*;
 import com.tinyparty.game.physic.EntityContactListener;
+import com.tinyparty.game.utils.AnimationManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,17 +43,19 @@ public class GameScreen extends ScreenAdapter {
 	public GameScreen(TinyParty game) {
 		this.game = game;
 		game.getLock().lock();
+		System.out.println("GameScreen");
 		ground = new Ground();
 		bulletManager = new BulletManager(game);
 		game.getLock().unlock();
 	}
 
-	public void init(int id, Vector2 position) {
+	public void init(int id, PlayerColor playerColor, Vector2 position, boolean horizontalFlip) {
 		loose = false;
 		world = new World(new Vector2(), false);
 		world.setContactListener(new EntityContactListener(game));
 
-		player = new Player(id, game);
+		player = new Player(id, playerColor, horizontalFlip, game);
+		player.touched();
 		player.setPosition(position);
 		entitiesToAdd.add(player);
 	}
@@ -66,12 +69,14 @@ public class GameScreen extends ScreenAdapter {
 		Batch batch = game.getBatch();
 		Camera camera = game.getCamera();
 		AssetManager assetManager = game.getAssetManager();
+		AnimationManager animationManager = game.getAnimationManager();
 
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
 			showDebugPhysics = !showDebugPhysics;
 		}
 
 		game.getLock().lock();
+		System.out.println("GameScreen");
 
 		/**
 		 * Player loose the game
@@ -119,7 +124,7 @@ public class GameScreen extends ScreenAdapter {
 
 		// Render entities
 		for(Entity entity : entities) {
-			entity.render(batch, assetManager);
+			entity.render(batch, assetManager, animationManager);
 		}
 
 		// TODO show UI with life, player kill and death count and ratio
@@ -142,6 +147,7 @@ public class GameScreen extends ScreenAdapter {
 	@Override
 	public void hide() {
 		game.getLock().lock();
+		System.out.println("GameScreen");
 
 		world.dispose();
 		world = null;
@@ -160,19 +166,20 @@ public class GameScreen extends ScreenAdapter {
 		world.dispose();
 	}
 
-	public void addNewOtherPlayer(int id, Vector2 position) {
-		OtherPlayer otherPlayer = new OtherPlayer(id, position, game);
+	public void addNewOtherPlayer(int id, PlayerColor playerColor, Vector2 position, boolean horizontalFlip) {
+		OtherPlayer otherPlayer = new OtherPlayer(id, playerColor, position, horizontalFlip, game);
 		entitiesToAdd.add(otherPlayer);
 		otherPlayer.touched();
 	}
 
-	public void changeOtherPlayerPosition(int id, Vector2 position) {
+	public void changeOtherPlayerPosition(int id, Vector2 position, boolean horizontalFlip) {
 		boolean found = false;
 		for(Entity entity : entities) {
 			if(entity instanceof OtherPlayer) {
 				OtherPlayer otherPlayer = (OtherPlayer)entity;
 				if(otherPlayer.getId() == id) {
 					otherPlayer.setPosition(position);
+					otherPlayer.setHorizontalFlip(horizontalFlip);
 					found = true;
 				}
 			}
@@ -184,6 +191,7 @@ public class GameScreen extends ScreenAdapter {
 					OtherPlayer otherPlayer = (OtherPlayer)entity;
 					if(otherPlayer.getId() == id) {
 						otherPlayer.setPosition(position);
+						otherPlayer.setHorizontalFlip(horizontalFlip);
 						found = true;
 					}
 				}

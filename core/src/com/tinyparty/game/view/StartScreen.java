@@ -74,6 +74,7 @@ public class StartScreen extends ScreenAdapter {
 		}
 
 		game.getLock().lock();
+		System.out.println("StartScreen");
 
 		camera.position.set(0 + Constants.CAMERA_WIDTH/2f,0 + Constants.CAMERA_HEIGHT/2f,0);
 		camera.update();

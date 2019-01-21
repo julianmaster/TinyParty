@@ -15,9 +15,16 @@ public enum Asset {
 	GROUND5("ground5.png"),
 	GROUND6("ground6.png"),
 	GROUND7("ground7.png"),
-	PLAYER("player.png"), // TODO change sprite to new one
-	PLAYER_2("player_2.png"),
 	STANDARD_BULLET("standard_bullet.png"),
+	RED_PLAYER("red_player_animation.png"),
+	RED_PLAYER_2("red_player_animation_2.png"),
+	RED_HEART("red_heart_animation.png"),
+	BLUE_PLAYER("blue_player_animation.png"),
+	BLUE_PLAYER_2("blue_player_animation_2.png"),
+	BLUE_HEART("blue_heart_animation.png"),
+	GREEN_PLAYER("green_player_animation.png"),
+	GREEN_PLAYER_2("green_player_animation_2.png"),
+	GREEN_HEART("green_heart_animation.png"),
 
 	// Test
 	TEST("badlogic.jpg");

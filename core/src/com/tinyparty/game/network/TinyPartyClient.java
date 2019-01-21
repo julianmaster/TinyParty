@@ -24,6 +24,7 @@ public class TinyPartyClient implements Disposable {
 		socket = ExtendedNet.getNet().newWebSocket(Constants.HOST, Constants.PORT);
 
 		lock.lock();
+		System.out.println("TinyPartyClient");
 		socket.addListener(getListener());
 		socket.connect();
 		lock.unlock();
@@ -32,26 +33,27 @@ public class TinyPartyClient implements Disposable {
 	private WebSocketListener getListener() {
 		return new AbstractWebSocketListener() {
 			@Override
-			protected boolean onMessage(com.github.czyzby.websocket.WebSocket webSocket, Object response) throws WebSocketException {
+			protected boolean onMessage(WebSocket webSocket, Object response) throws WebSocketException {
 				game.getLock().lock();
+				System.out.println("TinyPartyClient");
 				if(response instanceof ResponseJoinPartyJson) {
 					ResponseJoinPartyJson responseJoinPartyJson = (ResponseJoinPartyJson)response;
 
-					game.getGameScreen().init(responseJoinPartyJson.id, responseJoinPartyJson.position);
+					game.getGameScreen().init(responseJoinPartyJson.id, responseJoinPartyJson.playerColor, responseJoinPartyJson.position, responseJoinPartyJson.horizontalFlip);
 					for(int i = 0; i < responseJoinPartyJson.otherIds.length; i++) {
-						game.getGameScreen().addNewOtherPlayer(responseJoinPartyJson.otherIds[i], responseJoinPartyJson.otherPositions[i]);
+						game.getGameScreen().addNewOtherPlayer(responseJoinPartyJson.otherIds[i], responseJoinPartyJson.otherPlayerColors[i], responseJoinPartyJson.otherPositions[i], responseJoinPartyJson.otherHorizontalFlips[i]);
 					}
 					game.setScreen(game.getGameScreen());
 				}
 				else if(response instanceof ResponseNewOtherPlayerJson) {
 					ResponseNewOtherPlayerJson responseNewOtherPlayerJson = (ResponseNewOtherPlayerJson)response;
 
-					game.getGameScreen().addNewOtherPlayer(responseNewOtherPlayerJson.id, responseNewOtherPlayerJson.position);
+					game.getGameScreen().addNewOtherPlayer(responseNewOtherPlayerJson.id, responseNewOtherPlayerJson.playerColor, responseNewOtherPlayerJson.position, responseNewOtherPlayerJson.horizontalFlip);
 				}
 				else if(response instanceof ResponsePositionPlayerJson) {
 					ResponsePositionPlayerJson responsePositionPlayerJson = (ResponsePositionPlayerJson)response;
 
-					game.getGameScreen().changeOtherPlayerPosition(responsePositionPlayerJson.id, responsePositionPlayerJson.position);
+					game.getGameScreen().changeOtherPlayerPosition(responsePositionPlayerJson.id, responsePositionPlayerJson.position, responsePositionPlayerJson.horizontalFlip);
 				}
 				else if(response instanceof ResponsePlayerFireJson) {
 					ResponsePlayerFireJson responsePlayerFireJson = (ResponsePlayerFireJson)response;
@@ -83,6 +85,7 @@ public class TinyPartyClient implements Disposable {
 
 	public void send(Object packet) {
 		lock.lock();
+		System.out.println("TinyPartyClient");
 		if(socket.isOpen()) {
 			socket.send(packet);
 		}
