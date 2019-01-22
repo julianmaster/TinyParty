@@ -8,9 +8,7 @@ import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.Bullet;
 import com.tinyparty.game.model.Player;
 import com.tinyparty.game.network.json.client.RequestPlayerDieJson;
-import com.tinyparty.game.network.json.client.RequestPlayerInvinsibleJson;
-import com.tinyparty.game.view.GameScreen;
-import com.tinyparty.game.view.StartScreen;
+import com.tinyparty.game.network.json.client.RequestPlayerInvincibleJson;
 
 public class EntityContactListener implements ContactListener {
 
@@ -31,7 +29,6 @@ public class EntityContactListener implements ContactListener {
 		Object objectB = contact.getFixtureB().getBody().getUserData();
 
 		game.getLock().lock();
-		System.out.println("EntityContactListener");
 		if(objectA instanceof Bullet) {
 			// Bullet vs Player
 			if(objectB instanceof Player) {
@@ -51,7 +48,7 @@ public class EntityContactListener implements ContactListener {
 		Bullet bullet = (Bullet) bulletObject;
 		Player player = (Player) playerObject;
 
-		if(player.getLife() > 0 && !player.isInvinsible()) {
+		if(player.getLife() > 0 && !player.isInvincible()) {
 			player.touched();
 
 			if(player.getLife() == 0) {
@@ -66,9 +63,10 @@ public class EntityContactListener implements ContactListener {
 				game.getGameScreen().setLoose(true);
 			}
 			else {
-				RequestPlayerInvinsibleJson requestPlayerInvinsibleJson = new RequestPlayerInvinsibleJson();
-				requestPlayerInvinsibleJson.idPlayer = player.getId();
-				game.getClient().send(requestPlayerInvinsibleJson);
+				RequestPlayerInvincibleJson requestPlayerInvincibleJson = new RequestPlayerInvincibleJson();
+				requestPlayerInvincibleJson.idPlayer = player.getId();
+				requestPlayerInvincibleJson.invincible = true;
+				game.getClient().send(requestPlayerInvincibleJson);
 			}
 		}
 	}

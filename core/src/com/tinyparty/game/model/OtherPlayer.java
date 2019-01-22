@@ -1,7 +1,6 @@
 package com.tinyparty.game.model;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -10,7 +9,6 @@ import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.physic.PhysicManager;
 import com.tinyparty.game.utils.AnimationManager;
-import com.tinyparty.game.view.Asset;
 
 public class OtherPlayer extends Entity {
 
@@ -21,8 +19,7 @@ public class OtherPlayer extends Entity {
 	private final Vector2 size;
 	private Body body;
 
-	private boolean invinsible = false;
-	private float invinsibleDuration = 0f;
+	private boolean invincible = false;
 	private boolean white = false;
 	private float changeColor = 0f;
 
@@ -37,46 +34,28 @@ public class OtherPlayer extends Entity {
 		this.body = PhysicManager.createBox(position.x, position.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.OTHER_PLAYER_CATEGORY, Constants.OTHER_PLAYER_MASK, true, false, true,this, game.getGameScreen().getWorld());
 		this.stateTime = 0f;
 
-		invinsible = true;
-		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		invincible = true;
 		white = true;
 		changeColor = Constants.PLAYER_CHANGE_COLOR;
 	}
 
 	@Override
 	public void update(float delta) {
-		stateTime+= delta;
-		if(invinsible) {
-			invinsibleDuration -= delta;
+		stateTime += delta;
+		if(invincible) {
 			changeColor -= delta;
-			if(invinsibleDuration < 0f) {
-				invinsible = false;
-			}
-			else {
-				if(changeColor < 0f) {
-					changeColor = Constants.PLAYER_CHANGE_COLOR;
-					white = !white;
-				}
+			if(changeColor < 0f) {
+				changeColor = Constants.PLAYER_CHANGE_COLOR;
+				white = !white;
 			}
 		}
 	}
 
 	@Override
 	public void render(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
-//		Asset asset = playerColor.player;
-//
-//		if(invinsible && white) {
-//			asset = playerColor.player2;
-//		}
-//
-//		batch.draw(assetManager.get(asset.filename, Texture.class), body.getPosition().x - Constants.PLAYER_WIDTH/2f, body.getPosition().y - Constants.PLAYER_HEIGHT/2f);
-
-
-
-
 		TextureRegion currentFrame = (TextureRegion)animationManager.get(playerColor.player.filename).getKeyFrame(stateTime, true);
 
-		if(invinsible && white) {
+		if(invincible && white) {
 			currentFrame = (TextureRegion)animationManager.get(playerColor.player2.filename).getKeyFrame(stateTime, true);
 		}
 
@@ -96,10 +75,13 @@ public class OtherPlayer extends Entity {
 	}
 
 	public void touched() {
-		invinsible = true;
-		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		invincible = true;
 		white = true;
 		changeColor = Constants.PLAYER_CHANGE_COLOR;
+	}
+
+	public void endInvicible() {
+		invincible = false;
 	}
 
 	public void die() {

@@ -42,7 +42,7 @@ public class TinyPartyServer {
 		if(request instanceof RequestJoinPartyJson) {
 			RequestJoinPartyJson requestJoinPartyJson = (RequestJoinPartyJson)request;
 
-			// The id of player;
+			// The idPlayer of player;
 			int id = -1;
 			int playerSize = players.size();
 
@@ -75,6 +75,7 @@ public class TinyPartyServer {
 			PlayerColor[] otherPlayerColors = new PlayerColor[playerSize];
 			Vector2[] otherPositions = new Vector2[playerSize];
 			boolean[] otherHorizontalFlips = new boolean[playerSize];
+			boolean[] otherInvincibles = new boolean[playerSize];
 			int index = 0;
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
 				if(player.getKey() != id) {
@@ -82,22 +83,26 @@ public class TinyPartyServer {
 					otherPlayerColors[index] = player.getValue().playerColor;
 					otherPositions[index] = player.getValue().position;
 					otherHorizontalFlips[index] = player.getValue().horizontalFlip;
+					otherInvincibles[index] = player.getValue().invincible;
 				}
 			}
 
 			// Adding new player
-			Vector2 position = new Vector2(MathUtils.random()*100f, MathUtils.random()*100f); // TODO fix player start location
+			Vector2 position = new Vector2(MathUtils.random()*15*16, MathUtils.random()*15*16);
 			if(!exist) {
 				Data data = new Data();
 				data.webSocket = webSocket;
 				data.playerColor = playerColor;
+				data.ready = false;
 				data.position = position;
 				data.horizontalFlip = false;
+				data.invincible = true;
 				players.put(id, data);
 			}
 			else {
 				players.get(id).position = position;
 				players.get(id).horizontalFlip = false;
+				players.get(id).invincible = true;
 			}
 
 			ResponseJoinPartyJson responseJoinPartyJson = new ResponseJoinPartyJson();
@@ -109,6 +114,7 @@ public class TinyPartyServer {
 			responseJoinPartyJson.otherPlayerColors = otherPlayerColors;
 			responseJoinPartyJson.otherPositions = otherPositions;
 			responseJoinPartyJson.otherHorizontalFlips = otherHorizontalFlips;
+			responseJoinPartyJson.otherInvincibles = otherInvincibles;
 			webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseJoinPartyJson)));
 
 			// Send new other player informations
@@ -117,25 +123,47 @@ public class TinyPartyServer {
 			responseNewOtherPlayerJson.playerColor = playerColor;
 			responseNewOtherPlayerJson.position = responseJoinPartyJson.position;
 			responseNewOtherPlayerJson.horizontalFlip = false;
+			responseNewOtherPlayerJson.invincible = true;
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
-				if(player.getKey() != id) {
+				if(player.getKey() != id && player.getValue().ready) {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseNewOtherPlayerJson)));
 				}
 			}
 		}
+		else if(request instanceof RequestInfoOtherPlayerJson) {
+			RequestInfoOtherPlayerJson requestInfoOtherPlayerJson = (RequestInfoOtherPlayerJson)request;
+
+			Data data = players.get(requestInfoOtherPlayerJson);
+
+			if(data != null) {
+				ResponseNewOtherPlayerJson responseNewOtherPlayerJson = new ResponseNewOtherPlayerJson();
+				responseNewOtherPlayerJson.id = requestInfoOtherPlayerJson.otherPlayer;
+				responseNewOtherPlayerJson.playerColor = data.playerColor;
+				responseNewOtherPlayerJson.position = data.position;
+				responseNewOtherPlayerJson.horizontalFlip = data.horizontalFlip;
+				responseNewOtherPlayerJson.invincible = data.invincible;
+
+				players.get(requestInfoOtherPlayerJson.idPlayer).webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseNewOtherPlayerJson)));
+			}
+		}
+		else if(request instanceof RequestPlayerReadyJson) {
+			RequestPlayerReadyJson requestPlayerReadyJson = (RequestPlayerReadyJson)request;
+
+			players.get(requestPlayerReadyJson.idPlayer).ready = true;
+		}
 		else if(request instanceof RequestPositionPlayerJson) {
 			RequestPositionPlayerJson requestPositionPlayerJson = (RequestPositionPlayerJson)request;
 
-			players.get(requestPositionPlayerJson.id).position = requestPositionPlayerJson.position;
-			players.get(requestPositionPlayerJson.id).horizontalFlip = requestPositionPlayerJson.horizontalFlip;
+			players.get(requestPositionPlayerJson.idPlayer).position = requestPositionPlayerJson.position;
+			players.get(requestPositionPlayerJson.idPlayer).horizontalFlip = requestPositionPlayerJson.horizontalFlip;
 
 			ResponsePositionPlayerJson responsePositionPlayerJson = new ResponsePositionPlayerJson();
-			responsePositionPlayerJson.id = requestPositionPlayerJson.id;
+			responsePositionPlayerJson.id = requestPositionPlayerJson.idPlayer;
 			responsePositionPlayerJson.position = requestPositionPlayerJson.position;
 			responsePositionPlayerJson.horizontalFlip = requestPositionPlayerJson.horizontalFlip;
 
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
-				if(player.getKey() != requestPositionPlayerJson.id) {
+				if(player.getKey() != requestPositionPlayerJson.idPlayer && player.getValue().ready) {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePositionPlayerJson)));
 				}
 			}
@@ -151,20 +179,23 @@ public class TinyPartyServer {
 			responsePlayerFireJson.bulletDistanceAmountParameter = requestPlayerFireJson.bulletDistanceAmountParameter;
 
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
-				if(player.getKey() != requestPlayerFireJson.idPlayer) {
+				if(player.getKey() != requestPlayerFireJson.idPlayer && player.getValue().ready) {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerFireJson)));
 				}
 			}
 		}
-		else if(request instanceof RequestPlayerInvinsibleJson) {
-			RequestPlayerInvinsibleJson requestPlayerInvinsibleJson = (RequestPlayerInvinsibleJson)request;
+		else if(request instanceof RequestPlayerInvincibleJson) {
+			RequestPlayerInvincibleJson requestPlayerInvincibleJson = (RequestPlayerInvincibleJson)request;
 
-			ResponsePlayerInvinsibleJson responsePlayerInvinsibleJson = new ResponsePlayerInvinsibleJson();
-			responsePlayerInvinsibleJson.idPlayer = requestPlayerInvinsibleJson.idPlayer;
+			players.get(requestPlayerInvincibleJson.idPlayer).invincible = requestPlayerInvincibleJson.invincible;
+
+			ResponsePlayerInvincibleJson responsePlayerInvincibleJson = new ResponsePlayerInvincibleJson();
+			responsePlayerInvincibleJson.idPlayer = requestPlayerInvincibleJson.idPlayer;
+			responsePlayerInvincibleJson.invincible = requestPlayerInvincibleJson.invincible;
 
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
-				if(player.getKey() != requestPlayerInvinsibleJson.idPlayer) {
-					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerInvinsibleJson)));
+				if(player.getKey() != requestPlayerInvincibleJson.idPlayer && player.getValue().ready) {
+					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerInvincibleJson)));
 				}
 			}
 		}
@@ -175,8 +206,10 @@ public class TinyPartyServer {
 			responsePlayerDieJson.id = requestPlayerDieJson.id;
 			responsePlayerDieJson.bulletIdPlayer = requestPlayerDieJson.bulletIdPlayer;
 
+			players.get(requestPlayerDieJson.id).ready = false;
+
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
-				if(player.getKey() != requestPlayerDieJson.id) {
+				if(player.getKey() != requestPlayerDieJson.id && player.getValue().ready) {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responsePlayerDieJson)));
 				}
 			}

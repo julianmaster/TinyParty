@@ -8,4 +8,5 @@ public class ResponseNewOtherPlayerJson {
 	public PlayerColor playerColor;
 	public Vector2 position;
 	public boolean horizontalFlip;
+	public boolean invincible;
 }

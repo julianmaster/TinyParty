@@ -11,16 +11,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.*;
+import com.tinyparty.game.network.json.client.RequestInfoOtherPlayerJson;
+import com.tinyparty.game.network.json.client.RequestPlayerReadyJson;
 import com.tinyparty.game.physic.EntityContactListener;
 import com.tinyparty.game.utils.AnimationManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -43,7 +43,6 @@ public class GameScreen extends ScreenAdapter {
 	public GameScreen(TinyParty game) {
 		this.game = game;
 		game.getLock().lock();
-		System.out.println("GameScreen");
 		ground = new Ground();
 		bulletManager = new BulletManager(game);
 		game.getLock().unlock();
@@ -58,6 +57,10 @@ public class GameScreen extends ScreenAdapter {
 		player.touched();
 		player.setPosition(position);
 		entitiesToAdd.add(player);
+
+		RequestPlayerReadyJson requestPlayerReadyJson = new RequestPlayerReadyJson();
+		requestPlayerReadyJson.idPlayer = id;
+		game.getClient().send(requestPlayerReadyJson);
 	}
 
 	@Override
@@ -76,7 +79,6 @@ public class GameScreen extends ScreenAdapter {
 		}
 
 		game.getLock().lock();
-		System.out.println("GameScreen");
 
 		/**
 		 * Player loose the game
@@ -129,6 +131,15 @@ public class GameScreen extends ScreenAdapter {
 
 		// TODO show UI with life, player kill and death count and ratio
 
+		for(int life = 0; life < 3; life++) {
+			if(life < player.getLife()) {
+				// Render heart
+			}
+			else {
+				// Render empty heart
+			}
+		}
+
 		batch.end();
 
 		if(showDebugPhysics) {
@@ -147,7 +158,6 @@ public class GameScreen extends ScreenAdapter {
 	@Override
 	public void hide() {
 		game.getLock().lock();
-		System.out.println("GameScreen");
 
 		world.dispose();
 		world = null;
@@ -166,10 +176,12 @@ public class GameScreen extends ScreenAdapter {
 		world.dispose();
 	}
 
-	public void addNewOtherPlayer(int id, PlayerColor playerColor, Vector2 position, boolean horizontalFlip) {
+	public void addNewOtherPlayer(int id, PlayerColor playerColor, Vector2 position, boolean horizontalFlip, boolean invincible) {
 		OtherPlayer otherPlayer = new OtherPlayer(id, playerColor, position, horizontalFlip, game);
 		entitiesToAdd.add(otherPlayer);
-		otherPlayer.touched();
+		if(invincible) {
+			otherPlayer.touched();
+		}
 	}
 
 	public void changeOtherPlayerPosition(int id, Vector2 position, boolean horizontalFlip) {
@@ -197,6 +209,14 @@ public class GameScreen extends ScreenAdapter {
 				}
 			}
 		}
+
+		if(!found) {
+			RequestInfoOtherPlayerJson requestInfoOtherPlayerJson = new RequestInfoOtherPlayerJson();
+			requestInfoOtherPlayerJson.idPlayer = player.getId();
+			requestInfoOtherPlayerJson.otherPlayer = id;
+
+			game.getClient().send(requestInfoOtherPlayerJson);
+		}
 	}
 
 	public void removeOtherPlayer(int id) {
@@ -210,14 +230,46 @@ public class GameScreen extends ScreenAdapter {
 		}
 	}
 
-	public void changeOtherPlayerInvinsible(int id) {
+	public void changeOtherPlayerInvincible(int id, boolean start) {
+		boolean found = false;
 		for(Entity entity : entities) {
 			if(entity instanceof OtherPlayer) {
 				OtherPlayer otherPlayer = (OtherPlayer)entity;
 				if(otherPlayer.getId() == id) {
-					otherPlayer.touched();
+					if(start) {
+						otherPlayer.touched();
+					}
+					else {
+						otherPlayer.endInvicible();
+					}
+					found = true;
 				}
 			}
+		}
+
+		if(!found) {
+			for(Entity entity : entitiesToAdd) {
+				if(entity instanceof OtherPlayer) {
+					OtherPlayer otherPlayer = (OtherPlayer)entity;
+					if(otherPlayer.getId() == id) {
+						if(start) {
+							otherPlayer.touched();
+						}
+						else {
+							otherPlayer.endInvicible();
+						}
+						found = true;
+					}
+				}
+			}
+		}
+
+		if(!found) {
+			RequestInfoOtherPlayerJson requestInfoOtherPlayerJson = new RequestInfoOtherPlayerJson();
+			requestInfoOtherPlayerJson.idPlayer = player.getId();
+			requestInfoOtherPlayerJson.otherPlayer = id;
+
+			game.getClient().send(requestInfoOtherPlayerJson);
 		}
 	}
 

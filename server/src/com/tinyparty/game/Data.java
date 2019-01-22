@@ -7,6 +7,8 @@ import io.vertx.core.http.ServerWebSocket;
 public class Data {
 	public ServerWebSocket webSocket;
 	public PlayerColor playerColor;
+	public boolean ready;
 	public Vector2 position;
 	public boolean horizontalFlip;
+	public boolean invincible;
 }

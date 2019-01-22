@@ -22,7 +22,7 @@ public class BulletManager {
 			float angleDeg = angleRad * MathUtils.radiansToDegrees + offset;
 
 			Vector2 direction = new Vector2(MathUtils.cosDeg(angleDeg), MathUtils.sinDeg(angleDeg));
-			Vector2 position = new Vector2(source.x + 1f, source.y + 3f); // TODO change start position of bullet based on new player sprite size
+			Vector2 position = new Vector2(source.x, source.y);
 			new Bullet(playerId, sourceOfFire, position, direction, angleDeg*MathUtils.degreesToRadians, bulletSizeSpeedParameter.size, bulletSizeSpeedParameter.speed, bulletDistanceAmountParameter.distance, game);
 		}
 	}

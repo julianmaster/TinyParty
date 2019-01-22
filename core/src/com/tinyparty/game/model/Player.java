@@ -3,7 +3,6 @@ package com.tinyparty.game.model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -15,10 +14,10 @@ import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
 import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
 import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
+import com.tinyparty.game.network.json.client.RequestPlayerInvincibleJson;
 import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
 import com.tinyparty.game.physic.PhysicManager;
 import com.tinyparty.game.utils.AnimationManager;
-import com.tinyparty.game.view.Asset;
 
 public class Player extends Entity {
 
@@ -34,8 +33,8 @@ public class Player extends Entity {
 	private BulletSizeSpeedParameter bulletSizeSpeedParameter;
 	private BulletDistanceAmountParameter bulletDistanceAmountParameter;
 
-	private boolean invinsible = false;
-	private float invinsibleDuration = 0f;
+	private boolean invincible = false;
+	private float invincibleDuration = 0f;
 	private boolean white = false;
 	private float changeColor = 0f;
 	private float waitFire = Constants.BULLET_FREQUENCY;
@@ -66,11 +65,15 @@ public class Player extends Entity {
 			waitFire = -1f;
 		}
 
-		if(invinsible) {
-			invinsibleDuration -= delta;
+		if(invincible) {
+			invincibleDuration -= delta;
 			changeColor -= delta;
-			if(invinsibleDuration < 0f) {
-				invinsible = false;
+			if(invincibleDuration < 0f) {
+				invincible = false;
+				RequestPlayerInvincibleJson requestPlayerInvincibleJson = new RequestPlayerInvincibleJson();
+				requestPlayerInvincibleJson.idPlayer = getId();
+				requestPlayerInvincibleJson.invincible = invincible;
+				game.getClient().send(requestPlayerInvincibleJson);
 			}
 			else {
 				if(changeColor < 0f) {
@@ -121,7 +124,7 @@ public class Player extends Entity {
 		if(!body.getPosition().epsilonEquals(oldPosition)) {
 			oldPosition.set(body.getPosition());
 			RequestPositionPlayerJson requestPositionPlayerJson = new RequestPositionPlayerJson();
-			requestPositionPlayerJson.id = getId();
+			requestPositionPlayerJson.idPlayer = getId();
 			requestPositionPlayerJson.position = body.getPosition();
 			requestPositionPlayerJson.horizontalFlip = horizontalFlip;
 			game.getClient().send(requestPositionPlayerJson);
@@ -132,7 +135,7 @@ public class Player extends Entity {
 	public void render(Batch batch, AssetManager assetManager, AnimationManager animationManager) {
 		TextureRegion currentFrame = (TextureRegion)animationManager.get(playerColor.player.filename).getKeyFrame(stateTime, true);
 
-		if(invinsible && white) {
+		if(invincible && white) {
 			currentFrame = (TextureRegion)animationManager.get(playerColor.player2.filename).getKeyFrame(stateTime, true);
 		}
 
@@ -158,8 +161,8 @@ public class Player extends Entity {
 
 	public void touched() {
 		life -= 1;
-		invinsible = true;
-		invinsibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
+		invincible = true;
+		invincibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
 		changeColor = Constants.PLAYER_CHANGE_COLOR;
 		white = true;
 	}
@@ -201,7 +204,7 @@ public class Player extends Entity {
 		this.life = life;
 	}
 
-	public boolean isInvinsible() {
-		return invinsible;
+	public boolean isInvincible() {
+		return invincible;
 	}
 }

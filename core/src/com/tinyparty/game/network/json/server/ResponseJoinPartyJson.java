@@ -14,4 +14,5 @@ public class ResponseJoinPartyJson {
 	public PlayerColor[] otherPlayerColors;
 	public Vector2[] otherPositions;
 	public boolean[] otherHorizontalFlips;
+	public boolean[] otherInvincibles;
 }

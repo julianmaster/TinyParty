@@ -1,5 +1,6 @@
 package com.tinyparty.game.network.json.server;
 
-public class ResponsePlayerInvinsibleJson {
+public class ResponsePlayerInvincibleJson {
 	public int idPlayer;
+	public boolean invincible;
 }
