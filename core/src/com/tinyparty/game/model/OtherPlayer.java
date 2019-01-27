@@ -19,7 +19,7 @@ public class OtherPlayer extends Entity {
 	private final Vector2 size;
 	private Body body;
 
-	private boolean invincible = false;
+	private boolean invincible;
 	private boolean white = false;
 	private float changeColor = 0f;
 
@@ -34,9 +34,9 @@ public class OtherPlayer extends Entity {
 		this.body = PhysicManager.createBox(position.x, position.y, Constants.PLAYER_COLLISION_WIDTH, Constants.PLAYER_COLLISION_HEIGHT, 0, Constants.OTHER_PLAYER_CATEGORY, Constants.OTHER_PLAYER_MASK, true, false, true,this, game.getGameScreen().getWorld());
 		this.stateTime = 0f;
 
-		invincible = true;
-		white = true;
-		changeColor = Constants.PLAYER_CHANGE_COLOR;
+		invincible = false;
+		white = false;
+		changeColor = 0f;
 	}
 
 	@Override

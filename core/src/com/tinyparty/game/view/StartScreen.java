@@ -59,11 +59,12 @@ public class StartScreen extends ScreenAdapter {
 
 	@Override
 	public void render(float delta) {
-		Batch batch = game.getBatch();
+		Batch spriteBatch = game.getSpriteBatch();
+		Batch hudBatch = game.getHudBatch();
 		Camera camera = game.getCamera();
+		Camera hudCamera = game.getHudCamera();
 		BitmapFont fontBig = game.getFontBig();
 		BitmapFont fontNormal = game.getFontNormal();
-		BitmapFont fontSmall = game.getFontSmall();
 		GlyphLayout layout = game.getLayout();
 
 		timerColor -= delta;
@@ -73,42 +74,51 @@ public class StartScreen extends ScreenAdapter {
 			colorIndex %= colors.size();
 		}
 
-		game.getLock().lock();
+		synchronized (game.getLock()) {
+			/**
+			 * Sprite batch
+			 */
+			camera.position.set(0 + Constants.CAMERA_WIDTH/2f,0 + Constants.CAMERA_HEIGHT/2f,0);
+			camera.update();
+			spriteBatch.setProjectionMatrix(camera.combined);
+			spriteBatch.begin();
+			// Nothing
+			spriteBatch.end();
 
-		camera.position.set(0 + Constants.CAMERA_WIDTH/2f,0 + Constants.CAMERA_HEIGHT/2f,0);
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+			/**
+			 * HUD batch
+			 */
+			hudCamera.update();
+			hudBatch.setProjectionMatrix(hudCamera.combined);
+			hudBatch.begin();
 
-		batch.begin();
+			String finalText = "";
+			int i = colorIndex;
+			for(char c : "tinyparty".toCharArray()) {
+				finalText += "["+colors.get(i)+"]"+c;
+				i++;
+				i %= colors.size();
+			}
+			layout.setText(fontBig, finalText);
+			fontBig.draw(hudBatch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*4/5 + layout.height/2);
 
-		String finalText = "";
-		int i = colorIndex;
-		for(char c : "tinyparty".toCharArray()) {
-			finalText += "["+colors.get(i)+"]"+c;
-			i++;
-			i %= colors.size();
+			float ratio;
+			if(death < 1) {
+				ratio = kill;
+			}
+			else {
+				ratio = (float)kill/(float)death;
+			}
+
+			finalText = "[GRIS1]RATIO: [YELLOW1]"+round(ratio, 2);
+			layout.setText(fontNormal, finalText);
+			fontNormal.draw(hudBatch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*3/5 + layout.height/2);
+			finalText = " [GRIS1]K: [GREEN2]"+kill+"   [GRIS1]/D: [RED2]"+death+"[GRIS1]";
+			layout.setText(fontNormal, finalText);
+			fontNormal.draw(hudBatch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*3/5 + layout.height/2 - layout.height - 4);
+
+			hudBatch.end();
 		}
-		layout.setText(fontBig, finalText);
-		fontBig.draw(batch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*4/5 + layout.height/2);
-
-		float ratio;
-		if(death < 1) {
-			ratio = kill;
-		}
-		else {
-			ratio = (float)kill/(float)death;
-		}
-
-		finalText = "[GRIS1]RATIO: [YELLOW1]"+round(ratio, 2);
-		layout.setText(fontNormal, finalText);
-		fontNormal.draw(batch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*3/5 + layout.height/2);
-		finalText = " [GRIS1]K: [GREEN2]"+kill+"   [GRIS1]/D: [RED2]"+death+"[GRIS1]";
-		layout.setText(fontNormal, finalText);
-		fontNormal.draw(batch, layout, (Constants.CAMERA_WIDTH - layout.width)/2, Constants.CAMERA_WIDTH*3/5 + layout.height/2 - layout.height - 4);
-
-		batch.end();
-
-		game.getLock().unlock();
 	}
 
 	@Override

@@ -68,9 +68,9 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-box2d-gwt:$gdxVersion:sources"
-		compile "com.github.czyzby:gdx-websocket-gwt:$libVersion.$gdxVersion-SNAPSHOT"
+        compile "com.github.czyzby:gdx-websocket:$libVersion.$gdxVersion-SNAPSHOT:sources"
+        compile "com.github.czyzby:gdx-websocket-gwt:$libVersion.$gdxVersion-SNAPSHOT"
         compile "com.github.czyzby:gdx-websocket-gwt:$libVersion.$gdxVersion-SNAPSHOT:sources"
-        
     }
 }
 

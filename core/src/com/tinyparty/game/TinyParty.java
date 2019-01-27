@@ -19,11 +19,11 @@ import com.tinyparty.game.view.CustomColor;
 import com.tinyparty.game.view.GameScreen;
 import com.tinyparty.game.view.StartScreen;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 public class TinyParty extends Game {
-	private SpriteBatch batch;
+	private SpriteBatch spriteBatch;
+	private SpriteBatch hudBatch;
 	private OrthographicCamera camera;
+	private OrthographicCamera hudCamera;
 	private Viewport viewport;
 	private Stage stage;
 	private AssetManager assetManager;
@@ -39,13 +39,16 @@ public class TinyParty extends Game {
 	private StartScreen startScreen;
 	private GameScreen gameScreen;
 
-	private ReentrantLock lock = new ReentrantLock();
+	private Object lock = new Object();
 
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
+		spriteBatch = new SpriteBatch();
+		hudBatch = new SpriteBatch();
 		camera = new OrthographicCamera();
 		viewport = new FitViewport(Constants.CAMERA_WIDTH, Constants.CAMERA_HEIGHT, camera);
+		hudCamera = new OrthographicCamera(Constants.CAMERA_WIDTH, Constants.CAMERA_HEIGHT);
+		hudCamera.position.set(Constants.CAMERA_WIDTH/2, Constants.CAMERA_HEIGHT/2, 0);
 		assetManager = new AssetManager();
 		animationManager = new AnimationManager();
 
@@ -54,7 +57,7 @@ public class TinyParty extends Game {
 		CustomColor.reset();
 		load();
 
-		stage = new Stage(viewport, batch);
+		stage = new Stage(viewport, spriteBatch);
 		Gdx.input.setInputProcessor(stage);
 
 		// Define Font
@@ -87,12 +90,17 @@ public class TinyParty extends Game {
 		assetManager.load(Asset.RED_PLAYER.filename, Texture.class);
 		assetManager.load(Asset.RED_PLAYER_2.filename, Texture.class);
 		assetManager.load(Asset.RED_HEART.filename, Texture.class);
+		assetManager.load(Asset.EMPTY_RED_HEART.filename, Texture.class);
 		assetManager.load(Asset.BLUE_PLAYER.filename, Texture.class);
 		assetManager.load(Asset.BLUE_PLAYER_2.filename, Texture.class);
 		assetManager.load(Asset.BLUE_HEART.filename, Texture.class);
+		assetManager.load(Asset.EMPTY_BLUE_HEART.filename, Texture.class);
 		assetManager.load(Asset.GREEN_PLAYER.filename, Texture.class);
 		assetManager.load(Asset.GREEN_PLAYER_2.filename, Texture.class);
 		assetManager.load(Asset.GREEN_HEART.filename, Texture.class);
+		assetManager.load(Asset.EMPTY_GREEN_HEART.filename, Texture.class);
+		assetManager.load(Asset.BACKGROUND_UI_TOP.filename, Texture.class);
+		assetManager.load(Asset.BACKGROUND_UI_BOTTOM.filename, Texture.class);
 		assetManager.finishLoading();
 
 		animationManager.load(Asset.RED_PLAYER.filename, assetManager.get(Asset.RED_PLAYER.filename), 0.120f, Constants.PLAYER_WIDTH, Constants.PLAYER_HEIGHT);
@@ -121,17 +129,25 @@ public class TinyParty extends Game {
 	@Override
 	public void dispose () {
 		stage.dispose();
-		batch.dispose();
+		spriteBatch.dispose();
 		assetManager.dispose();
 		client.dispose();
 	}
 
-	public SpriteBatch getBatch() {
-		return batch;
+	public SpriteBatch getSpriteBatch() {
+		return spriteBatch;
+	}
+
+	public SpriteBatch getHudBatch() {
+		return hudBatch;
 	}
 
 	public OrthographicCamera getCamera() {
 		return camera;
+	}
+
+	public OrthographicCamera getHudCamera() {
+		return hudCamera;
 	}
 
 	public Stage getStage() {
@@ -166,7 +182,7 @@ public class TinyParty extends Game {
 		return client;
 	}
 
-	public ReentrantLock getLock() {
+	public Object getLock() {
 		return lock;
 	}
 

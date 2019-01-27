@@ -22,7 +22,7 @@ public class TextActionButton extends Actor {
 	private boolean activate = true;
 	private boolean mouseOver = false;
 
-	private ReentrantLock lock = new ReentrantLock();
+	private Object lock = new Object();
 
 	private GlyphLayout layout = new GlyphLayout();
 
@@ -45,16 +45,16 @@ public class TextActionButton extends Actor {
 		this.addListener(new InputListener() {
 			@Override
 			public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-				lock.lock();
-				mouseOver = true;
-				lock.unlock();
+				synchronized (lock) {
+					mouseOver = true;
+				}
 			}
 
 			@Override
 			public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-				lock.lock();
-				mouseOver = false;
-				lock.unlock();
+				synchronized (lock) {
+					mouseOver = false;
+				}
 			}
 		});
 	}
@@ -63,14 +63,14 @@ public class TextActionButton extends Actor {
 	public void draw(Batch batch, float parentAlpha) {
 		BitmapFontCache cache = font.getCache();
 
-		lock.lock();
-		Color color = defaultColor;
-		if(mouseOver && activate) {
-			color = mouseOverColor;
+		synchronized (lock) {
+			Color color = defaultColor;
+			if (mouseOver && activate) {
+				color = mouseOverColor;
+			}
+			cache.setColor(color);
 		}
-		lock.unlock();
 
-		cache.setColor(color);
 		cache.setText(str, getX(), getY() + layout.height);
 		cache.draw(batch);
 		cache.clear();
@@ -92,9 +92,9 @@ public class TextActionButton extends Actor {
 	}
 
 	public void setActivate(boolean activate) {
-		lock.lock();
-		this.activate = activate;
-		lock.unlock();
+		synchronized (lock) {
+			this.activate = activate;
+		}
 	}
 
 	public boolean isActivate() {

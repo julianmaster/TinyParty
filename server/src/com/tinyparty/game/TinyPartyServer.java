@@ -1,5 +1,6 @@
 package com.tinyparty.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.czyzby.websocket.serialization.Serializer;
@@ -129,6 +130,8 @@ public class TinyPartyServer {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseNewOtherPlayerJson)));
 				}
 			}
+
+			Gdx.app.log("Server", "Join Party");
 		}
 		else if(request instanceof RequestInfoOtherPlayerJson) {
 			RequestInfoOtherPlayerJson requestInfoOtherPlayerJson = (RequestInfoOtherPlayerJson)request;

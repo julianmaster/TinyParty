@@ -28,20 +28,20 @@ public class EntityContactListener implements ContactListener {
 		Object objectA = contact.getFixtureA().getBody().getUserData();
 		Object objectB = contact.getFixtureB().getBody().getUserData();
 
-		game.getLock().lock();
-		if(objectA instanceof Bullet) {
-			// Bullet vs Player
-			if(objectB instanceof Player) {
-				bulletPlayerContact(objectA, objectB);
+		synchronized (game.getLock()) {
+			if(objectA instanceof Bullet) {
+				// Bullet vs Player
+				if(objectB instanceof Player) {
+					bulletPlayerContact(objectA, objectB);
+				}
+			}
+			else if(objectB instanceof Bullet) {
+				// Bullet vs Player
+				if(objectA instanceof Player) {
+					bulletPlayerContact(objectB, objectA);
+				}
 			}
 		}
-		else if(objectB instanceof Bullet) {
-			// Bullet vs Player
-			if(objectA instanceof Player) {
-				bulletPlayerContact(objectB, objectA);
-			}
-		}
-		game.getLock().unlock();
 	}
 
 	private void bulletPlayerContact(Object bulletObject, Object playerObject) {

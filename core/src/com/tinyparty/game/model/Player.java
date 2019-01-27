@@ -161,6 +161,10 @@ public class Player extends Entity {
 
 	public void touched() {
 		life -= 1;
+		invincible();
+	}
+
+	public void invincible() {
 		invincible = true;
 		invincibleDuration = Constants.PLAYER_INVINCIBLE_DURATION;
 		changeColor = Constants.PLAYER_CHANGE_COLOR;
@@ -202,6 +206,10 @@ public class Player extends Entity {
 
 	public void setLife(int life) {
 		this.life = life;
+	}
+
+	public PlayerColor getPlayerColor() {
+		return playerColor;
 	}
 
 	public boolean isInvincible() {

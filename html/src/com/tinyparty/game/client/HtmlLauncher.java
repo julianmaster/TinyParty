@@ -3,6 +3,8 @@ package com.tinyparty.game.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.github.czyzby.websocket.GwtWebSockets;
+import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 
 public class HtmlLauncher extends GwtApplication {
@@ -10,7 +12,7 @@ public class HtmlLauncher extends GwtApplication {
         // USE THIS CODE FOR A FIXED SIZE APPLICATION
         @Override
         public GwtApplicationConfiguration getConfig () {
-                return new GwtApplicationConfiguration(480, 320);
+                return new GwtApplicationConfiguration(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
         }
         // END CODE FOR FIXED SIZE APPLICATION
 
@@ -46,6 +48,8 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
+                // Initiating web sockets module
+                GwtWebSockets.initiate();
                 return new TinyParty();
         }
 }
