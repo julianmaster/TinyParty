@@ -7,8 +7,8 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.Bullet;
 import com.tinyparty.game.model.Player;
-import com.tinyparty.game.network.json.client.RequestPlayerDieJson;
-import com.tinyparty.game.network.json.client.RequestPlayerInvincibleJson;
+import com.tinyparty.game.shared.RequestPlayerDieJson;
+import com.tinyparty.game.shared.RequestPlayerInvincibleJson;
 
 public class EntityContactListener implements ContactListener {
 

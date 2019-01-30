@@ -13,9 +13,9 @@ import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
 import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
-import com.tinyparty.game.network.json.client.RequestPlayerFireJson;
-import com.tinyparty.game.network.json.client.RequestPlayerInvincibleJson;
-import com.tinyparty.game.network.json.client.RequestPositionPlayerJson;
+import com.tinyparty.game.shared.RequestPlayerFireJson;
+import com.tinyparty.game.shared.RequestPlayerInvincibleJson;
+import com.tinyparty.game.shared.RequestPositionPlayerJson;
 import com.tinyparty.game.physic.PhysicManager;
 import com.tinyparty.game.utils.AnimationManager;
 
@@ -93,10 +93,13 @@ public class Player extends Entity {
 
 			RequestPlayerFireJson requestPlayerFireJson = new RequestPlayerFireJson();
 			requestPlayerFireJson.idPlayer = getId();
-			requestPlayerFireJson.position = body.getPosition();
-			requestPlayerFireJson.worldClickCoords = worldClickCoords;
-			requestPlayerFireJson.bulletSizeSpeedParameter = bulletSizeSpeedParameter;
-			requestPlayerFireJson.bulletDistanceAmountParameter = bulletDistanceAmountParameter;
+			requestPlayerFireJson.x = body.getPosition().x;
+			requestPlayerFireJson.y = body.getPosition().y;
+			requestPlayerFireJson.worldClickCoordsX = worldClickCoords.x;
+			requestPlayerFireJson.worldClickCoordsY = worldClickCoords.y;
+			requestPlayerFireJson.worldClickCoordsZ = worldClickCoords.z;
+			requestPlayerFireJson.bulletSizeSpeedParameter = bulletSizeSpeedParameter.name();
+			requestPlayerFireJson.bulletDistanceAmountParameter = bulletDistanceAmountParameter.name();
 			game.getClient().send(requestPlayerFireJson);
 		}
 
@@ -125,7 +128,8 @@ public class Player extends Entity {
 			oldPosition.set(body.getPosition());
 			RequestPositionPlayerJson requestPositionPlayerJson = new RequestPositionPlayerJson();
 			requestPositionPlayerJson.idPlayer = getId();
-			requestPositionPlayerJson.position = body.getPosition();
+			requestPositionPlayerJson.x = body.getPosition().x;
+			requestPositionPlayerJson.y = body.getPosition().y;
 			requestPositionPlayerJson.horizontalFlip = horizontalFlip;
 			game.getClient().send(requestPositionPlayerJson);
 		}

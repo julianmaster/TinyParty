@@ -1,6 +1,8 @@
 package com.tinyparty.game.network;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.czyzby.websocket.AbstractWebSocketListener;
 import com.github.czyzby.websocket.WebSocket;
@@ -9,7 +11,10 @@ import com.github.czyzby.websocket.data.WebSocketException;
 import com.github.czyzby.websocket.net.ExtendedNet;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
-import com.tinyparty.game.network.json.server.*;
+import com.tinyparty.game.model.PlayerColor;
+import com.tinyparty.game.model.parameter.BulletDistanceAmountParameter;
+import com.tinyparty.game.model.parameter.BulletSizeSpeedParameter;
+import com.tinyparty.game.shared.*;
 
 public class TinyPartyClient implements Disposable {
 
@@ -24,9 +29,7 @@ public class TinyPartyClient implements Disposable {
 
 		synchronized (lock) {
 			socket.addListener(getListener());
-			Gdx.app.log("Server", "connect...");
 			socket.connect();
-			Gdx.app.log("Server", "connected");
 		}
 	}
 
@@ -39,27 +42,26 @@ public class TinyPartyClient implements Disposable {
 						if(response instanceof ResponseJoinPartyJson) {
 							ResponseJoinPartyJson responseJoinPartyJson = (ResponseJoinPartyJson)response;
 
-							game.getGameScreen().init(responseJoinPartyJson.id, responseJoinPartyJson.playerColor, responseJoinPartyJson.position, responseJoinPartyJson.horizontalFlip);
+							game.getGameScreen().init(responseJoinPartyJson.id, PlayerColor.valueOf(responseJoinPartyJson.playerColor), new Vector2(responseJoinPartyJson.x, responseJoinPartyJson.y), responseJoinPartyJson.horizontalFlip);
 							for(int i = 0; i < responseJoinPartyJson.otherIds.length; i++) {
-								game.getGameScreen().addNewOtherPlayer(responseJoinPartyJson.otherIds[i], responseJoinPartyJson.otherPlayerColors[i], responseJoinPartyJson.otherPositions[i], responseJoinPartyJson.otherHorizontalFlips[i], responseJoinPartyJson.otherInvincibles[i]);
+								game.getGameScreen().addNewOtherPlayer(responseJoinPartyJson.otherIds[i], PlayerColor.valueOf(responseJoinPartyJson.otherPlayerColors[i]), new Vector2(responseJoinPartyJson.otherPositionsX[i], responseJoinPartyJson.otherPositionsY[i]), responseJoinPartyJson.otherHorizontalFlips[i], responseJoinPartyJson.otherInvincibles[i]);
 							}
-							Gdx.app.log("Client", "Join Party");
 							game.setScreen(game.getGameScreen());
 						}
 						else if(response instanceof ResponseNewOtherPlayerJson) {
 							ResponseNewOtherPlayerJson responseNewOtherPlayerJson = (ResponseNewOtherPlayerJson)response;
 
-							game.getGameScreen().addNewOtherPlayer(responseNewOtherPlayerJson.id, responseNewOtherPlayerJson.playerColor, responseNewOtherPlayerJson.position, responseNewOtherPlayerJson.horizontalFlip, responseNewOtherPlayerJson.invincible);
+							game.getGameScreen().addNewOtherPlayer(responseNewOtherPlayerJson.id, PlayerColor.valueOf(responseNewOtherPlayerJson.playerColor), new Vector2(responseNewOtherPlayerJson.x, responseNewOtherPlayerJson.y), responseNewOtherPlayerJson.horizontalFlip, responseNewOtherPlayerJson.invincible);
 						}
 						else if(response instanceof ResponsePositionPlayerJson) {
 							ResponsePositionPlayerJson responsePositionPlayerJson = (ResponsePositionPlayerJson)response;
 
-							game.getGameScreen().changeOtherPlayerPosition(responsePositionPlayerJson.id, responsePositionPlayerJson.position, responsePositionPlayerJson.horizontalFlip);
+							game.getGameScreen().changeOtherPlayerPosition(responsePositionPlayerJson.id, new Vector2(responsePositionPlayerJson.x, responsePositionPlayerJson.y), responsePositionPlayerJson.horizontalFlip);
 						}
 						else if(response instanceof ResponsePlayerFireJson) {
 							ResponsePlayerFireJson responsePlayerFireJson = (ResponsePlayerFireJson)response;
 
-							game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, responsePlayerFireJson.position, responsePlayerFireJson.worldClickCoords, responsePlayerFireJson.bulletSizeSpeedParameter, responsePlayerFireJson.bulletDistanceAmountParameter);
+							game.getGameScreen().getBulletManager().fire(responsePlayerFireJson.idPlayer, false, new Vector2(responsePlayerFireJson.x, responsePlayerFireJson.y), new Vector3(responsePlayerFireJson.worldClickCoordsX, responsePlayerFireJson.worldClickCoordsY, responsePlayerFireJson.worldClickCoordsZ), BulletSizeSpeedParameter.valueOf(responsePlayerFireJson.bulletSizeSpeedParameter), BulletDistanceAmountParameter.valueOf(responsePlayerFireJson.bulletDistanceAmountParameter));
 						}
 						else if(response instanceof ResponsePlayerInvincibleJson) {
 							ResponsePlayerInvincibleJson responsePlayerInvincibleJson = (ResponsePlayerInvincibleJson)response;

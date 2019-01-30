@@ -17,8 +17,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
 import com.tinyparty.game.model.*;
-import com.tinyparty.game.network.json.client.RequestInfoOtherPlayerJson;
-import com.tinyparty.game.network.json.client.RequestPlayerReadyJson;
+import com.tinyparty.game.shared.RequestInfoOtherPlayerJson;
+import com.tinyparty.game.shared.RequestPlayerReadyJson;
 import com.tinyparty.game.physic.EntityContactListener;
 import com.tinyparty.game.utils.AnimationManager;
 

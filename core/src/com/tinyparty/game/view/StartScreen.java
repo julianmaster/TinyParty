@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.tinyparty.game.Constants;
 import com.tinyparty.game.TinyParty;
-import com.tinyparty.game.network.json.client.RequestJoinPartyJson;
+import com.tinyparty.game.shared.RequestJoinPartyJson;
 
 import java.util.LinkedList;
 import java.util.List;

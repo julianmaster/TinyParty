@@ -80,8 +80,16 @@ project(":server") {
 
     dependencies {
 		compile project(":core")
-        compile "com.github.czyzby:gdx-websocket:$libVersion.$gdxVersion-SNAPSHOT"
+        compile "io.vertx:vertx-core:$vertxVersion"
+    }
+}
 
+project(":shared") {
+    apply plugin: "java"
+
+
+    dependencies {
+        compile "com.github.czyzby:gdx-websocket:$libVersion.$gdxVersion-SNAPSHOT"
     }
 }
 
@@ -90,6 +98,7 @@ project(":core") {
 
 
     dependencies {
+        compile project(":shared")
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 		compile "com.github.czyzby:gdx-websocket:$libVersion.$gdxVersion-SNAPSHOT"

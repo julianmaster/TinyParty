@@ -7,6 +7,7 @@
 
 
 	<inherits name='TinyParty' />
+	<inherits name='Shared' />
 	<entry-point class='com.tinyparty.game.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../core/assets" />

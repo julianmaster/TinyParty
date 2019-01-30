@@ -1,4 +1,4 @@
-package com.tinyparty.game.network.json.server;
+package com.tinyparty.game.shared;
 
 public class ResponsePlayerDieJson {
 	public int id;

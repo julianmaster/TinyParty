@@ -1,13 +1,11 @@
 package com.tinyparty.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.czyzby.websocket.serialization.Serializer;
 import com.github.czyzby.websocket.serialization.impl.JsonSerializer;
 import com.tinyparty.game.model.PlayerColor;
-import com.tinyparty.game.network.json.client.*;
-import com.tinyparty.game.network.json.server.*;
+import com.tinyparty.game.shared.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
@@ -37,6 +35,7 @@ public class TinyPartyServer {
 	}
 
 	private void handleFrame(final ServerWebSocket webSocket, final WebSocketFrame frame) {
+		// Deserializing received message
 		final Object request = serializer.deserialize(frame.binaryData().getBytes());
 
 		lock.lock();
@@ -45,6 +44,7 @@ public class TinyPartyServer {
 
 			// The idPlayer of player;
 			int id = -1;
+			PlayerColor playerColor = null;
 			int playerSize = players.size();
 
 			boolean exist = false;
@@ -52,6 +52,7 @@ public class TinyPartyServer {
 				if(player.getValue().webSocket == webSocket) {
 					exist = true;
 					id = player.getKey();
+					playerColor = player.getValue().playerColor;
 					playerSize--;
 					break;
 				}
@@ -62,6 +63,7 @@ public class TinyPartyServer {
 				do {
 					id = MathUtils.random(100000);
 				} while(players.containsKey(id));
+				playerColor = PlayerColor.values()[MathUtils.random(PlayerColor.values().length-1)];
 			}
 
 			if(id == -1) {
@@ -69,20 +71,20 @@ public class TinyPartyServer {
 				return;
 			}
 
-			PlayerColor playerColor = PlayerColor.values()[MathUtils.random(PlayerColor.values().length-1)];
-
 			// Search informations of others players
 			int[] otherIds = new int[playerSize];
-			PlayerColor[] otherPlayerColors = new PlayerColor[playerSize];
-			Vector2[] otherPositions = new Vector2[playerSize];
+			String[] otherPlayerColors = new String[playerSize];
+			float[] otherPositionsX = new float[playerSize];
+			float[] otherPositionsY = new float[playerSize];
 			boolean[] otherHorizontalFlips = new boolean[playerSize];
 			boolean[] otherInvincibles = new boolean[playerSize];
 			int index = 0;
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
 				if(player.getKey() != id) {
 					otherIds[index] = player.getKey();
-					otherPlayerColors[index] = player.getValue().playerColor;
-					otherPositions[index] = player.getValue().position;
+					otherPlayerColors[index] = player.getValue().playerColor.name();
+					otherPositionsX[index] = player.getValue().position.x;
+					otherPositionsY[index] = player.getValue().position.y;
 					otherHorizontalFlips[index] = player.getValue().horizontalFlip;
 					otherInvincibles[index] = player.getValue().invincible;
 				}
@@ -108,12 +110,14 @@ public class TinyPartyServer {
 
 			ResponseJoinPartyJson responseJoinPartyJson = new ResponseJoinPartyJson();
 			responseJoinPartyJson.id = id;
-			responseJoinPartyJson.playerColor = playerColor;
-			responseJoinPartyJson.position = position;
+			responseJoinPartyJson.playerColor = playerColor.name();
+			responseJoinPartyJson.x = position.x;
+			responseJoinPartyJson.y = position.y;
 			responseJoinPartyJson.horizontalFlip = false;
 			responseJoinPartyJson.otherIds = otherIds;
 			responseJoinPartyJson.otherPlayerColors = otherPlayerColors;
-			responseJoinPartyJson.otherPositions = otherPositions;
+			responseJoinPartyJson.otherPositionsX = otherPositionsX;
+			responseJoinPartyJson.otherPositionsY = otherPositionsY;
 			responseJoinPartyJson.otherHorizontalFlips = otherHorizontalFlips;
 			responseJoinPartyJson.otherInvincibles = otherInvincibles;
 			webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseJoinPartyJson)));
@@ -121,8 +125,9 @@ public class TinyPartyServer {
 			// Send new other player informations
 			ResponseNewOtherPlayerJson responseNewOtherPlayerJson = new ResponseNewOtherPlayerJson();
 			responseNewOtherPlayerJson.id = id;
-			responseNewOtherPlayerJson.playerColor = playerColor;
-			responseNewOtherPlayerJson.position = responseJoinPartyJson.position;
+			responseNewOtherPlayerJson.playerColor = playerColor.name();
+			responseNewOtherPlayerJson.x = responseJoinPartyJson.x;
+			responseNewOtherPlayerJson.y = responseJoinPartyJson.y;
 			responseNewOtherPlayerJson.horizontalFlip = false;
 			responseNewOtherPlayerJson.invincible = true;
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
@@ -130,8 +135,6 @@ public class TinyPartyServer {
 					player.getValue().webSocket.writeBinaryMessage(Buffer.buffer(serializer.serialize(responseNewOtherPlayerJson)));
 				}
 			}
-
-			Gdx.app.log("Server", "Join Party");
 		}
 		else if(request instanceof RequestInfoOtherPlayerJson) {
 			RequestInfoOtherPlayerJson requestInfoOtherPlayerJson = (RequestInfoOtherPlayerJson)request;
@@ -141,8 +144,9 @@ public class TinyPartyServer {
 			if(data != null) {
 				ResponseNewOtherPlayerJson responseNewOtherPlayerJson = new ResponseNewOtherPlayerJson();
 				responseNewOtherPlayerJson.id = requestInfoOtherPlayerJson.otherPlayer;
-				responseNewOtherPlayerJson.playerColor = data.playerColor;
-				responseNewOtherPlayerJson.position = data.position;
+				responseNewOtherPlayerJson.playerColor = data.playerColor.name();
+				responseNewOtherPlayerJson.x = data.position.x;
+				responseNewOtherPlayerJson.y = data.position.y;
 				responseNewOtherPlayerJson.horizontalFlip = data.horizontalFlip;
 				responseNewOtherPlayerJson.invincible = data.invincible;
 
@@ -157,12 +161,14 @@ public class TinyPartyServer {
 		else if(request instanceof RequestPositionPlayerJson) {
 			RequestPositionPlayerJson requestPositionPlayerJson = (RequestPositionPlayerJson)request;
 
-			players.get(requestPositionPlayerJson.idPlayer).position = requestPositionPlayerJson.position;
+			players.get(requestPositionPlayerJson.idPlayer).position.x = requestPositionPlayerJson.x;
+			players.get(requestPositionPlayerJson.idPlayer).position.y = requestPositionPlayerJson.y;
 			players.get(requestPositionPlayerJson.idPlayer).horizontalFlip = requestPositionPlayerJson.horizontalFlip;
 
 			ResponsePositionPlayerJson responsePositionPlayerJson = new ResponsePositionPlayerJson();
 			responsePositionPlayerJson.id = requestPositionPlayerJson.idPlayer;
-			responsePositionPlayerJson.position = requestPositionPlayerJson.position;
+			responsePositionPlayerJson.x = requestPositionPlayerJson.x;
+			responsePositionPlayerJson.y = requestPositionPlayerJson.y;
 			responsePositionPlayerJson.horizontalFlip = requestPositionPlayerJson.horizontalFlip;
 
 			for(Map.Entry<Integer, Data> player : players.entrySet()) {
@@ -176,8 +182,11 @@ public class TinyPartyServer {
 
 			ResponsePlayerFireJson responsePlayerFireJson = new ResponsePlayerFireJson();
 			responsePlayerFireJson.idPlayer = requestPlayerFireJson.idPlayer;
-			responsePlayerFireJson.position = requestPlayerFireJson.position;
-			responsePlayerFireJson.worldClickCoords = requestPlayerFireJson.worldClickCoords;
+			responsePlayerFireJson.x = requestPlayerFireJson.x;
+			responsePlayerFireJson.y = requestPlayerFireJson.y;
+			responsePlayerFireJson.worldClickCoordsX = requestPlayerFireJson.worldClickCoordsX;
+			responsePlayerFireJson.worldClickCoordsY = requestPlayerFireJson.worldClickCoordsY;
+			responsePlayerFireJson.worldClickCoordsZ = requestPlayerFireJson.worldClickCoordsZ;
 			responsePlayerFireJson.bulletSizeSpeedParameter = requestPlayerFireJson.bulletSizeSpeedParameter;
 			responsePlayerFireJson.bulletDistanceAmountParameter = requestPlayerFireJson.bulletDistanceAmountParameter;
 

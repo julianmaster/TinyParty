@@ -1,4 +1,4 @@
-package com.tinyparty.game.network.json.server;
+package com.tinyparty.game.shared;
 
 public class ResponsePlayerInvincibleJson {
 	public int idPlayer;
