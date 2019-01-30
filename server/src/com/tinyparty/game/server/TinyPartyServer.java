@@ -1,9 +1,10 @@
-package com.tinyparty.game;
+package com.tinyparty.game.server;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.czyzby.websocket.serialization.Serializer;
 import com.github.czyzby.websocket.serialization.impl.JsonSerializer;
+import com.tinyparty.game.Constants;
 import com.tinyparty.game.model.PlayerColor;
 import com.tinyparty.game.shared.*;
 import io.vertx.core.Vertx;

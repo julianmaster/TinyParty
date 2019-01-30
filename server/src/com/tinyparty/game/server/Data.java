@@ -1,4 +1,4 @@
-package com.tinyparty.game;
+package com.tinyparty.game.server;
 
 import com.badlogic.gdx.math.Vector2;
 import com.tinyparty.game.model.PlayerColor;
