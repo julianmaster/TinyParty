@@ -25,7 +25,7 @@ public class TinyPartyClient implements Disposable {
 	public TinyPartyClient(TinyParty game) {
 		this.game = game;
 
-		socket = ExtendedNet.getNet().newWebSocket(Constants.HOST, Constants.PORT);
+		socket = ExtendedNet.getNet().newSecureWebSocket(Constants.HOST, Constants.PORT);
 
 		synchronized (lock) {
 			socket.addListener(getListener());

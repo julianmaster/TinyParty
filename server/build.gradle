@@ -6,11 +6,13 @@ sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "com.tinyparty.game.server.TinyPartyServer"
+project.ext.assetsDir = new File("../server/assets");
 
 task dist(type: Jar) {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
+    from files(project.assetsDir);
 
     manifest {
         attributes 'Main-Class': project.mainClassName

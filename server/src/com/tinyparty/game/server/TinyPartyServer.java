@@ -10,8 +10,10 @@ import com.tinyparty.game.shared.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocketFrame;
+import io.vertx.core.net.JksOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,12 @@ public class TinyPartyServer {
 
 	private void launch() {
 		System.out.println("Launching web socket server...");
-		final HttpServer server = vertx.createHttpServer();
+
+		HttpServerOptions options = new HttpServerOptions();
+		options.setSsl(true);
+		options.setKeyStoreOptions(new JksOptions().setPath("/path/to/keystore").setPassword("password"));
+
+		final HttpServer server = vertx.createHttpServer(options);
 		server.websocketHandler(webSocket -> {
 			webSocket.frameHandler(frame -> handleFrame(webSocket, frame));
 			webSocket.endHandler(frame -> handleSocketClosed(webSocket, frame));
