@@ -14,6 +14,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 import io.vertx.core.http.WebSocketFrame;
 import io.vertx.core.net.JksOptions;
+import io.vertx.core.net.PemKeyCertOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +32,9 @@ public class TinyPartyServer {
 		System.out.println("Launching web socket server...");
 
 		HttpServerOptions options = new HttpServerOptions();
+		options.setUseAlpn(true);
 		options.setSsl(true);
-		options.setKeyStoreOptions(new JksOptions().setPath("/path/to/keystore").setPassword("password"));
+		options.setPemKeyCertOptions(new PemKeyCertOptions().setKeyPath("/path/to/keyfile").setCertPath("/path/to/Certfile"));
 
 		final HttpServer server = vertx.createHttpServer(options);
 		server.websocketHandler(webSocket -> {
